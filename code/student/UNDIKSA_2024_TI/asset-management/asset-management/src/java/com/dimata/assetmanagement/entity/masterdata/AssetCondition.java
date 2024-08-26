@@ -4,10 +4,12 @@
  */
 package com.dimata.assetmanagement.entity.masterdata;
 
+import com.dimata.qdep.entity.Entity;
+
 /**
  *
  * @author saras
  */
-public class AssetConditions {
+public class AssetCondition extends Entity {
     
 }
