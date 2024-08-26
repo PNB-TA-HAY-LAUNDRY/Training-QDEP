@@ -9,5 +9,5 @@ package com.dimata.pajakdaerah.entity;
  * @author ihsan
  */
 public class JenisPajak {
-    private string nama;
+    private String nama;
 }
