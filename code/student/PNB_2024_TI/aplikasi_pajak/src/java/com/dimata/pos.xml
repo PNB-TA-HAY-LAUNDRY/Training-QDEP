@@ -94,9 +94,9 @@
                 <dbuser>root</dbuser>
 		<dbpasswd>dsj123go</dbpasswd-->
                 
-        <dburl>jdbc:mysql://localhost:3306/pos_raditya_20240809</dburl>  
+        <dburl>jdbc:mysql://localhost:3306/pajak_daerah</dburl>  
                 <dbuser>root</dbuser>
-		<dbpasswd>dsj123go</dbpasswd>
+		<dbpasswd></dbpasswd>
         
         <!--Cludeka server-->
 <!--        <dburl>jdbc:mysql://103.147.159.90:3306/demo_pos</dburl>
