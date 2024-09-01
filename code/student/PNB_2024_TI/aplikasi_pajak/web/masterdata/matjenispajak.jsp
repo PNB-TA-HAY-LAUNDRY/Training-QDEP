@@ -1,94 +1,74 @@
-<%@ page import="java.util.Vector, com.dimata.pajak.entity.JenisPajak, com.dimata.pajak.entity.Daerah, com.dimata.pajak.ctrl.FrmJenisPajak, com.dimata.pajak.ctrl.JenisPajakController, com.dimata.pajak.ctrl.DaerahController" %>
+ <%@ page import="java.util.Vector" %>
+<%@ page import="com.dimata.pajak.entity.JenisPajak" %>
+<%@ page import="com.dimata.pajak.ctrl.JenisPajakController" %>
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Jenis Pajak</title>
-    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/styles/styles.css">
+    <title>Manajemen Jenis Pajak</title>
 </head>
 <body>
-    <header>
-        <h1>Daftar Jenis Pajak</h1>
-    </header>
-    <main>
-        <%
-            // Mengambil pesan dari request
-            String message = (String) request.getAttribute("message");
-            if (message != null) {
-                String messageClass = message.contains("Perintah tidak valid") || message.contains("Terjadi kesalahan") ? "error-message" : "success-message";
-                out.println("<div class='message " + messageClass + "'>" + message + "</div>");
-            }
+    <h1>Manajemen Jenis Pajak</h1>
 
-            // Mendapatkan daftar jenis pajak
-            JenisPajakController jenisPajakController = new JenisPajakController();
-            Vector<JenisPajak> jenisPajakList = jenisPajakController.getAllJenisPajak();
+    <!-- Menampilkan Pesan -->
+    <p><%= request.getAttribute("msgString") %></p>
 
-            // Mendapatkan daftar daerah
-            DaerahController daerahController = new DaerahController();
-            Vector<Daerah> daerahList = daerahController.getAllDaerah();
-        %>
-        
-        <!-- Form untuk menambahkan jenis pajak -->
-        <form action="JenisPajakController" method="post">
-            <input type="hidden" name="cmd" value="2"> <!-- Command untuk Add -->
-            <h2>Tambah Jenis Pajak</h2>
-            <label for="nama">Nama:</label>
-            <input type="text" id="nama" name="<%= FrmJenisPajak.fieldNames[FrmJenisPajak.FRM_FIELD_NAMA] %>" required>
-            <label for="deskripsi">Deskripsi:</label>
-            <textarea id="deskripsi" name="<%= FrmJenisPajak.fieldNames[FrmJenisPajak.FRM_FIELD_DESKRIPSI] %>" required></textarea>
-            <label for="daerah">Daerah:</label>
-            <select id="daerah" name="<%= FrmJenisPajak.fieldNames[FrmJenisPajak.FRM_FIELD_DAERAH_ID] %>" required>
-                <%
-                    for (Daerah daerah : daerahList) {
-                        out.println("<option value='" + daerah.getOId() + "'>" + daerah.getNama() + "</option>");
-                    }
-                %>
-            </select>
-            <input type="submit" value="Tambah">
-        </form>
+    <!-- Form untuk Menambah atau Memperbarui Jenis Pajak -->
+    <form action="JenisPajakController" method="post">
+        <input type="hidden" name="cmd" value="<%= request.getAttribute("currentCmd") %>" />
+        <input type="hidden" name="id" value="<%= request.getAttribute("currentId") %>" />
 
-        <!-- Tabel untuk menampilkan jenis pajak -->
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nama</th>
-                    <th>Deskripsi</th>
-                    <th>Daerah</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%
-                    for (JenisPajak jenisPajak : jenisPajakList) {
-                        Daerah daerah = daerahController.getDaerahById(jenisPajak.getDaerahId()); // Mendapatkan daerah terkait
-                %>
+        <label for="nama">Nama:</label>
+        <input type="text" id="nama" name="nama" value="<%= request.getAttribute("currentNama") %>" required />
+        <br />
+
+        <label for="deskripsi">Deskripsi:</label>
+        <input type="text" id="deskripsi" name="deskripsi" value="<%= request.getAttribute("currentDeskripsi") %>" required />
+        <br />
+
+        <label for="daerah_id">Daerah ID:</label>
+        <input type="text" id="daerah_id" name="daerah_id" value="<%= request.getAttribute("currentDaerahId") %>" required />
+        <br />
+
+        <input type="submit" value="Simpan" />
+    </form>
+
+    <!-- Tabel untuk Menampilkan Daftar Jenis Pajak -->
+    <h2>Daftar Jenis Pajak</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nama</th>
+                <th>Deskripsi</th>
+                <th>Daerah ID</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% 
+                Vector<JenisPajak> jenisPajakList = (Vector<JenisPajak>) request.getAttribute("jenisPajakList");
+                if (jenisPajakList != null) {
+                    for (JenisPajak jenisPajak : jenisPajakList) { 
+            %>
                 <tr>
                     <td><%= jenisPajak.getOId() %></td>
                     <td><%= jenisPajak.getNama() %></td>
                     <td><%= jenisPajak.getDeskripsi() %></td>
-                    <td><%= daerah != null ? daerah.getNama() : "N/A" %></td>
+                    <td><%= jenisPajak.getDaerahId() %></td>
                     <td>
-                        <!-- Formulir untuk Update -->
-                        <form action="JenisPajakController" method="post" style="display:inline;">
-                            <input type="hidden" name="cmd" value="3"> <!-- Command untuk Update -->
-                            <input type="hidden" name="<%= FrmJenisPajak.fieldNames[FrmJenisPajak.FRM_FIELD_JENIS_PAJAK_ID] %>" value="<%= jenisPajak.getOId() %>">
-                            <input type="submit" value="Update">
-                        </form>
-                        <!-- Formulir untuk Delete -->
-                        <form action="JenisPajakController" method="post" style="display:inline;">
-                            <input type="hidden" name="cmd" value="1"> <!-- Command untuk Delete -->
-                            <input type="hidden" name="<%= FrmJenisPajak.fieldNames[FrmJenisPajak.FRM_FIELD_JENIS_PAJAK_ID] %>" value="<%= jenisPajak.getOId() %>">
-                            <input type="submit" value="Delete" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                        </form>
+                        <a href="matjenispajak.jsp?cmd=UPDATE&id=<%= jenisPajak.getOId() %>">Edit</a>
+                        <a href="JenisPajakController?cmd=DELETE&id=<%= jenisPajak.getOId() %>">Hapus</a>
                     </td>
                 </tr>
-                <%
-                    }
-                %>
-            </tbody>
-        </table>
-    </main>
+            <% 
+                    } 
+                } else { 
+            %>
+                <tr>
+                    <td colspan="5">Tidak ada data</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
 </body>
 </html>

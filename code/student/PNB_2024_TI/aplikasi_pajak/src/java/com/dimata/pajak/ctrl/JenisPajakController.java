@@ -27,7 +27,7 @@ public class JenisPajakController extends Control implements I_Language {
     };
 
     private String msgString;
-    
+
     public JenisPajakController() {
         msgString = "";
     }
@@ -83,74 +83,100 @@ public class JenisPajakController extends Control implements I_Language {
         try {
             Long.parseLong(daerahIdStr);
         } catch (NumberFormatException e) {
-            msgString = "Daerah ID harus berupa angka.";
+            msgString = "Daerah ID tidak valid.";
             return false;
         }
 
         return true;
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        msgString = "";
-        ResultStatus status = ResultStatus.OK;
-
-        int cmd = Integer.parseInt(request.getParameter("cmd"));
-        long oidJenisPajak = Long.parseLong(request.getParameter("oidJenisPajak"));
-
-        try {
-            if (cmd == 1) { 
-                if (oidJenisPajak != 0) {
-                    long oid = PstJenisPajak.deleteExc(oidJenisPajak);
-                    msgString = "Berhasil menghapus jenis pajak.";
-                } else {
-                    status = ResultStatus.NOT_FOUND;
-                    msgString = getSystemMessage(status);
-                }
-            } else if (cmd == 2 || cmd == 3) { // CREATE or UPDATE command
-                if (validateInput(request)) {
-                    JenisPajak jenisPajak = new JenisPajak();
-                    jenisPajak.setNama(request.getParameter("nama"));
-                    jenisPajak.setDeskripsi(request.getParameter("deskripsi"));
-                    
-                    // Mendapatkan daerah_id dari request dan mengaturnya ke objek JenisPajak
-                    long daerahId = Long.parseLong(request.getParameter("daerah_id"));
-                    jenisPajak.setDaerahId(daerahId);
-
-                    if (cmd == 2) { // CREATE command
-                        PstJenisPajak.insertExc(jenisPajak);
-                        msgString = "Berhasil menambahkan jenis pajak.";
-                    } else { // UPDATE command
-                        jenisPajak.setId(oidJenisPajak);
-                        PstJenisPajak.updateExc(jenisPajak);
-                        msgString = "Berhasil memperbarui jenis pajak.";
-                    }
-                } else {
-                    status = ResultStatus.VALIDATION_ERROR;
-                    msgString = getSystemMessage(status);
-                }
-            } else {
-                status = ResultStatus.UNKNOWN_ERROR;
-                msgString = "Perintah tidak valid";
+    private int getCommand(HttpServletRequest request) {
+        int cmd = 0;
+        String command = request.getParameter("command");
+        if (command != null) {
+            try {
+                cmd = Integer.parseInt(command);
+            } catch (NumberFormatException e) {
+                System.out.println("Error parsing command: " + e.getMessage());
             }
-        } catch (DBException dbexc) {
-            status = ResultStatus.DELETE_RESTRICT;
-            msgString = getSystemMessage(status);
-        } catch (Exception exc) {
-            status = ResultStatus.UNKNOWN_ERROR;
-            msgString = getSystemMessage(status);
         }
-
-        request.setAttribute("message", msgString);
-        response.sendRedirect("matjenispajak.jsp");
+        return cmd;
     }
 
-    public Vector<JenisPajak> getAllJenisPajak() {
-        Vector<JenisPajak> jenisPajakList = new Vector<>();
-        try {
-            jenisPajakList = PstJenisPajak.list(0, 0, null, "ID");
-        } catch (Exception e) {
-            msgString = "Terjadi kesalahan saat mengambil data.";
+    private long getOId(HttpServletRequest request) {
+        long oid = 0;
+        String oidStr = request.getParameter("oid");
+        if (oidStr != null) {
+            try {
+                oid = Long.parseLong(oidStr);
+            } catch (NumberFormatException e) {
+                System.out.println("Error parsing OID: " + e.getMessage());
+            }
         }
-        return jenisPajakList;
+        return oid;
+    }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    msgString = "";
+    
+    // Menggunakan parameter dari request untuk menentukan perintah (cmd)
+    String action = request.getParameter("cmd"); // asumsikan 'cmd' adalah parameter dari request
+    
+    JenisPajak jenisPajak = new JenisPajak();
+    
+    if (!"DELETE".equalsIgnoreCase(action)) { // Periksa apakah tindakan bukan DELETE
+        if (!validateInput(request)) {
+            return;
+        }
+        jenisPajak.setNama(request.getParameter("nama"));
+        jenisPajak.setDeskripsi(request.getParameter("deskripsi"));
+        jenisPajak.setDaerahId(Long.parseLong(request.getParameter("daerah_id")));
+    }
+
+    // Gunakan switch-case untuk menentukan aksi berdasarkan action string
+    switch (action != null ? action.toUpperCase() : "") {
+        case "CREATE":
+            try {
+                PstJenisPajak.insertExc(jenisPajak);
+                msgString = resultText[0][0]; // Berhasil
+            } catch (DBException e) {
+                msgString = getSystemMessage(ResultStatus.UNKNOWN_ERROR);
+            }
+            break;
+
+        case "UPDATE":
+            try {
+                PstJenisPajak.updateExc(jenisPajak);
+                msgString = resultText[0][0]; // Berhasil
+            } catch (DBException e) {
+                msgString = getSystemMessage(ResultStatus.NOT_FOUND);
+            }
+            break;
+
+        case "DELETE":
+            long oid = getOId(request);
+            if (oid != 0) {
+                try {
+                    PstJenisPajak.deleteExc(oid);
+                    msgString = resultText[0][0]; // Berhasil
+                } catch (DBException e) {
+                    msgString = getSystemMessage(ResultStatus.DELETE_RESTRICT);
+                }
+            }
+            break;
+
+        default:
+            msgString = resultText[0][1]; // Tidak dapat diproses
+            break;
+    }
+}
+
+
+    public Vector<JenisPajak> getAllJenisPajak() {
+        try {
+            return PstJenisPajak.listAll();
+        } catch (DBException e) {
+            return new Vector<>();
+        }
     }
 }

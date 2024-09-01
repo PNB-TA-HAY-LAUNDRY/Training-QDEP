@@ -3,8 +3,6 @@ package com.dimata.pajak.entity;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
-
-import com.dimata.util.*;
 import com.dimata.qdep.db.*;
 import com.dimata.qdep.entity.*;
 import com.dimata.util.lang.I_Language;
@@ -33,10 +31,6 @@ public class PstJenisPajak extends DBHandler implements I_DBInterface, I_DBType,
         TYPE_STRING,
         TYPE_LONG  // Tipe kolom daerah_id
     };
-
-    public static Vector<JenisPajak> list(int i, int i0, Object object, String id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 
     public PstJenisPajak() {
     }
@@ -112,27 +106,26 @@ public class PstJenisPajak extends DBHandler implements I_DBInterface, I_DBType,
         }
     }
 
-public static long insertExc(JenisPajak jenisPajak) throws DBException {
-    String sql = "INSERT INTO " + TBL_JENIS_PAJAK + " (NAMA, DESKRIPSI, DAERAH_ID) VALUES (?, ?, ?)";
-    try (PreparedStatement pstmt = DBHandler.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-        pstmt.setString(1, jenisPajak.getNama());
-        pstmt.setString(2, jenisPajak.getDeskripsi());
-        pstmt.setLong(3, jenisPajak.getDaerahId());
-        pstmt.executeUpdate();
+    public static long insertExc(JenisPajak jenisPajak) throws DBException {
+        String sql = "INSERT INTO " + TBL_JENIS_PAJAK + " (NAMA, DESKRIPSI, DAERAH_ID) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = DBHandler.getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, jenisPajak.getNama());
+            pstmt.setString(2, jenisPajak.getDeskripsi());
+            pstmt.setLong(3, jenisPajak.getDaerahId());
+            pstmt.executeUpdate();
 
-        try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-            if (generatedKeys.next()) {
-                jenisPajak.setId(generatedKeys.getLong(1));
-            } else {
-                throw new DBException(new PstJenisPajak(), DBException.UNKNOWN);
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    jenisPajak.setId(generatedKeys.getLong(1));
+                } else {
+                    throw new DBException(new PstJenisPajak(), DBException.UNKNOWN);
+                }
             }
+        } catch (SQLException e) {
+            throw new DBException(new PstJenisPajak(), DBException.UNKNOWN);
         }
-    } catch (SQLException e) {
-        throw new DBException(new PstJenisPajak(), DBException.UNKNOWN);
+        return jenisPajak.getOId();
     }
-    return jenisPajak.getOId();
-}
-
 
     public static long updateExc(JenisPajak jenisPajak) throws DBException {
         try {

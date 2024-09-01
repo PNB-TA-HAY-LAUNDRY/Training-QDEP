@@ -58,6 +58,7 @@ public class DaerahController {
         return new Daerah();
     }
     
+    
         public Vector<Daerah> getAllDaerah() {
         Vector<Daerah> daerahs = new Vector<>();
         try {

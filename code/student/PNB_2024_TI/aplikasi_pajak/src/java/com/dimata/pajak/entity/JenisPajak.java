@@ -7,7 +7,7 @@ public class JenisPajak extends Entity {
     private long id;
     private String nama;
     private String deskripsi;
-    private long daerahId;  // Menyimpan ID daerah yang berelasi
+    private long daerahId;
 
     public long getOId() {
         return id;
