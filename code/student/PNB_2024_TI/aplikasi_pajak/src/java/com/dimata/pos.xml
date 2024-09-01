@@ -94,7 +94,7 @@
                 <dbuser>root</dbuser>
 		<dbpasswd>dsj123go</dbpasswd-->
                 
-        <dburl>jdbc:mysql://localhost:3306/pajak_daerah</dburl>  
+        <dburl>jdbc:mysql://localhost:3306/db_pajak</dburl>  
                 <dbuser>root</dbuser>
 		<dbpasswd></dbpasswd>
         

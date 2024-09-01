@@ -4,7 +4,6 @@ package com.dimata.qdep.db;
 
 // import java
 
-import com.dimata.pajak.entity.PstDaerah;
 import com.dimata.qdep.system.I_DBExceptionInfo;
 
 
@@ -109,10 +108,6 @@ public class DBException extends Exception  implements I_DBExceptionInfo
 
           return SQL_ERROR;
 
-    }
-
-    public DBException(PstDaerah pstDaerah, int UNKNOWN, Exception e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 

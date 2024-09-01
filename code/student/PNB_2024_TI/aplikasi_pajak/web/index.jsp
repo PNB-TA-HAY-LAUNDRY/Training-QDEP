@@ -41,7 +41,9 @@
     <div class="container">
         <h1>Selamat Datang!</h1>
         <div>
-            <a href="masterdata/matjenispajak.jsp">Jenis Pajak</a>
+            <a href="masterdata/list_tax_types.jsp">Jenis Pajak</a>
+            <a href="masterdata/regional_tax_list.jsp">Pajak Daerah</a>
+            <a href="masterdata/taxPeriodList.jsp">Periode Pajak</a>
             <a href="masterdata/matdaerah.jsp">Daerah</a>
         </div>
     </div>
