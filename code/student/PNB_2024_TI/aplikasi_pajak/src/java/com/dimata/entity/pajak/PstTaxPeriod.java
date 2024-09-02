@@ -12,7 +12,10 @@ import com.dimata.qdep.db.I_DBType;
 import com.dimata.qdep.entity.Entity;
 import com.dimata.qdep.entity.I_PersintentExc;
 import com.dimata.util.lang.I_Language;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Vector;
 
 /**
@@ -169,6 +172,28 @@ public class PstTaxPeriod extends DBHandler implements I_DBInterface, I_DBType, 
         e.printStackTrace(); // Print exception stack trace
     }
 }
+    
+    public static int deleteById(long id) throws DBException, SQLException {
+        Connection connection = null;
+        Statement statement = null;
+        int result = -1;
+        try {
+            connection = DBHandler.getConnection();
+            statement = connection.createStatement();
+            String sql = "DELETE FROM " + TBL_TAX_PERIOD + " WHERE " + fieldNames[FLD_TAX_PERIOD_ID] + " = " + id;
+            result = statement.executeUpdate(sql);
+            if (result == 0) {
+                throw new DBException(new PstTaxPeriod(), DBException.RECORD_NOT_FOUND);
+            }
+        } catch (SQLException sqlexception) {
+            sqlexception.printStackTrace(System.err);
+            throw new DBException(new PstTaxPeriod(), sqlexception);
+        } finally {
+            closeStatement(statement);
+            closeConnection(connection);
+        }
+        return result;
+    }
 
 
     public static boolean checkOID(long taxPeriodId) {

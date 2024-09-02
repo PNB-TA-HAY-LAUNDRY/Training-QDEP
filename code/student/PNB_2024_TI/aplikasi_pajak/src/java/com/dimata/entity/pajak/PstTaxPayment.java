@@ -9,8 +9,11 @@ import com.dimata.qdep.entity.Entity;
 import com.dimata.qdep.entity.I_PersintentExc;
 import com.dimata.util.lang.I_Language;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Vector;
 
 /**
@@ -155,6 +158,29 @@ public class PstTaxPayment extends DBHandler implements I_DBInterface, I_DBType,
             System.out.println("error : " + e);
         }
     }
+    
+    public static int deleteById(long id) throws DBException, SQLException {
+    Connection connection = null;
+    Statement statement = null;
+    int result = -1;
+    try {
+        connection = DBHandler.getConnection();
+        statement = connection.createStatement();
+        String sql = "DELETE FROM " + TBL_TAX_PAYMENT + " WHERE " + fieldNames[FLD_TAX_PAYMENT_ID] + " = " + id;
+        result = statement.executeUpdate(sql);
+        if (result == 0) {
+            throw new DBException(new PstTaxPayment(), DBException.RECORD_NOT_FOUND);
+        }
+    } catch (SQLException sqlexception) {
+        sqlexception.printStackTrace(System.err);
+        throw new DBException(new PstTaxPayment(), sqlexception);
+    } finally {
+        closeStatement(statement);
+        closeConnection(connection);
+    }
+    return result;
+}
+
 
     public static boolean checkOID(long taxPaymentId) {
         DBResultSet dbrs = null;

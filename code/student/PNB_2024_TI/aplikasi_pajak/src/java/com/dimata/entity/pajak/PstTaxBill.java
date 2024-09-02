@@ -9,7 +9,10 @@ import com.dimata.qdep.entity.Entity;
 import com.dimata.qdep.entity.I_PersintentExc;
 import com.dimata.util.lang.I_Language;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Vector;
 
 /**
@@ -99,12 +102,30 @@ public class PstTaxBill extends DBHandler implements I_DBInterface, I_DBType, I_
 
     public long deleteExc(long oid) throws DBException {
         try {
+            // Hapus data terkait di tabel PembayaranPajak sebelum menghapus dari TagihanPajak
+            deletePaymentsByTaxBillId(oid);
+            
             PstTaxBill pstTaxBill = new PstTaxBill();
+            pstTaxBill.setLong(FLD_TAX_BILL_ID, oid);
             pstTaxBill.delete();
         } catch (Exception e) {
             throw new DBException(this, DBException.UNKNOWN);
         }
         return oid;
+    }
+    
+    private void deletePaymentsByTaxBillId(long id) throws DBException, SQLException {
+        Connection connection = null;
+        Statement statement = null;
+        try {
+            connection = DBHandler.getConnection();
+            statement = connection.createStatement();
+            String sql = "DELETE FROM PembayaranPajak WHERE id_tagihan_pajak = " + id;
+            statement.executeUpdate(sql);
+        } finally {
+            closeStatement(statement);
+            closeConnection(connection);
+        }
     }
 
     public static TaxBill fetchExc(long oid) throws DBException {
@@ -160,6 +181,29 @@ public class PstTaxBill extends DBHandler implements I_DBInterface, I_DBType, I_
             System.out.println("error : " + e);
         }
     }
+    
+    public static int deleteById(long id) throws DBException, SQLException {
+        Connection connection = null;
+        Statement statement = null;
+        int result = -1;
+        try {
+            connection = DBHandler.getConnection();
+            statement = connection.createStatement();
+            String sql = "DELETE FROM " + TBL_TAX_BILL + " WHERE " + fieldNames[FLD_TAX_BILL_ID] + " = " + id;
+            result = statement.executeUpdate(sql);
+            if (result == 0) {
+                throw new DBException(new PstTaxBill(), DBException.RECORD_NOT_FOUND);
+            }
+        } catch (SQLException sqlexception) {
+            sqlexception.printStackTrace(System.err);
+            throw new DBException(new PstTaxBill(), sqlexception);
+        } finally {
+            closeStatement(statement);
+            closeConnection(connection);
+        }
+        return result;
+    }
+
 
     public static boolean checkOID(long taxBillId) {
         DBResultSet dbrs = null;

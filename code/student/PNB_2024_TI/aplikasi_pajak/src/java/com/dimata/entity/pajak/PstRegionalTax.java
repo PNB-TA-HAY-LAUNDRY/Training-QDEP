@@ -12,7 +12,10 @@ import com.dimata.qdep.db.I_DBType;
 import com.dimata.qdep.entity.Entity;
 import com.dimata.qdep.entity.I_PersintentExc;
 import com.dimata.util.lang.I_Language;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Vector;
 
 /**
@@ -161,6 +164,28 @@ public class PstRegionalTax extends DBHandler implements I_DBInterface, I_DBType
         System.out.println("error : " + e);
     }
 }
+    
+    public static int deleteById(long id) throws DBException, SQLException {
+        Connection connection = null;
+        Statement statement = null;
+        int result = -1;
+        try {
+            connection = DBHandler.getConnection();
+            statement = connection.createStatement();
+            String sql = "DELETE FROM " + TBL_REGIONAL_TAX + " WHERE " + fieldNames[FLD_REGIONAL_TAX_ID] + " = " + id;
+            result = statement.executeUpdate(sql);
+            if (result == 0) {
+                throw new DBException(new PstRegionalTax(), DBException.RECORD_NOT_FOUND);
+            }
+        } catch (SQLException sqlexception) {
+            sqlexception.printStackTrace(System.err);
+            throw new DBException(new PstRegionalTax(), sqlexception);
+        } finally {
+            closeStatement(statement);
+            closeConnection(connection);
+        }
+        return result;
+    }
 
 
     public static boolean checkOID(long regionalTaxId) {

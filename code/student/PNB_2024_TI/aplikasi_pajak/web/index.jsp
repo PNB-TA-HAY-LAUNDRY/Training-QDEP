@@ -43,8 +43,9 @@
         <div>
             <a href="masterdata/list_tax_types.jsp">Jenis Pajak</a>
             <a href="masterdata/regional_tax_list.jsp">Pajak Daerah</a>
-            <a href="masterdata/taxPeriodList.jsp">Periode Pajak</a>
-            <a href="masterdata/matdaerah.jsp">Daerah</a>
+            <a href="masterdata/period_tax_list.jsp">periode pajak</a>
+            <a href="masterdata/bill_tax_list.jsp">Tagihan Pajak</a>
+            <a href="masterdata/payment_tax_list.jsp">Pembayaran Pajak</a>
         </div>
     </div>
 </body>

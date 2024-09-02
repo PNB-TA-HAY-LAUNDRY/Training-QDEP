@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.dimata.entity.pajak;
 
-/**
- *
- * @author ihsan
- */
 import com.dimata.qdep.db.DBException;
 import com.dimata.qdep.db.DBHandler;
 import com.dimata.qdep.db.DBResultSet;
@@ -18,7 +10,6 @@ import com.dimata.qdep.entity.I_PersintentExc;
 import com.dimata.util.lang.I_Language;
 import java.sql.*;
 import java.util.*;
-
 
 public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_PersintentExc, I_Language {
 
@@ -62,7 +53,7 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
     public int[] getFieldTypes() {
         return fieldTypes;
     }
-    
+
     public String getPersistentName() {
         return new PstTaxType().getClass().getName();
     }
@@ -94,7 +85,6 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
         }
         return 0;
     }
-
 
     public long deleteExc(long oid) throws DBException {
         try {
@@ -139,7 +129,7 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
                 lists.add(taxType);
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error: " + e);
         } finally {
             DBResultSet.close(dbrs);
         }
@@ -148,12 +138,34 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
 
     public static void resultToObject(ResultSet rs, TaxType taxType) {
         try {
-            taxType.setOID(rs.getLong(fieldNames[FLD_TAX_TYPE_ID]));
+            taxType.setId(rs.getLong(fieldNames[FLD_TAX_TYPE_ID]));
             taxType.setName(rs.getString(fieldNames[FLD_NAME]));
             taxType.setDescription(rs.getString(fieldNames[FLD_DESCRIPTION]));
         } catch (Exception e) {
-            System.out.println("error : " + e);
+            System.out.println("Error: " + e);
         }
+    }
+
+    public static int deleteById(long id) throws DBException {
+        Connection connection = null;
+        Statement statement = null;
+        int result = -1;
+        try {
+            connection = DBHandler.getConnection();
+            statement = connection.createStatement();
+            String sql = "DELETE FROM " + TBL_TAX_TYPE + " WHERE " + fieldNames[FLD_TAX_TYPE_ID] + " = " + id;
+            result = statement.executeUpdate(sql);
+            if (result == 0) {
+                throw new DBException(new PstTaxType(), DBException.RECORD_NOT_FOUND);
+            }
+        } catch (SQLException sqlexception) {
+            sqlexception.printStackTrace(System.err);
+            throw new DBException(new PstTaxType(), sqlexception);
+        } finally {
+            closeStatement(statement);
+            closeConnection(connection);
+        }
+        return result;
     }
 
     public static boolean checkOID(long taxTypeId) {

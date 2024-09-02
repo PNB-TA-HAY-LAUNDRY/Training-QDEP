@@ -11,7 +11,6 @@ import com.dimata.qdep.entity.*;
  * @author ihsan
  */
 public class TaxType extends Entity {
-
     private long id;
     private String name = "";
     private String description = "";
@@ -29,10 +28,7 @@ public class TaxType extends Entity {
     }
 
     public void setName(String name) {
-        if (name == null) {
-            name = "";
-        }
-        this.name = name;
+        this.name = name != null ? name : "";
     }
 
     public String getDescription() {
@@ -40,9 +36,6 @@ public class TaxType extends Entity {
     }
 
     public void setDescription(String description) {
-        if (description == null) {
-            description = "";
-        }
-        this.description = description;
+        this.description = description != null ? description : "";
     }
 }
