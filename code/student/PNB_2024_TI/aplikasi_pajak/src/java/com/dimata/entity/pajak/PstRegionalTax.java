@@ -45,6 +45,10 @@ public class PstRegionalTax extends DBHandler implements I_DBInterface, I_DBType
         TYPE_STRING
     };
 
+    public static void update(RegionalTax regionalTax) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     public PstRegionalTax() {
     }
 
@@ -125,8 +129,7 @@ public class PstRegionalTax extends DBHandler implements I_DBInterface, I_DBType
             throw new DBException(new PstRegionalTax(), DBException.UNKNOWN);
         }
     }
-
-    public static Vector<RegionalTax> list(int limitStart, int recordToGet, String whereClause, String order) {
+public static Vector<RegionalTax> list(int limitStart, int recordToGet, String whereClause, String order) {
     Vector<RegionalTax> lists = new Vector<>();
     DBResultSet dbrs = null;
     try {
@@ -134,10 +137,12 @@ public class PstRegionalTax extends DBHandler implements I_DBInterface, I_DBType
         if (whereClause != null && !whereClause.isEmpty()) {
             sql += " WHERE " + whereClause;
         }
+        sql += " ORDER BY " + fieldNames[FLD_REGIONAL_TAX_ID] + " ASC";
         if (order != null && !order.isEmpty()) {
-            sql += " ORDER BY " + order;
+            sql += ", " + order;
         }
         sql += " LIMIT " + limitStart + "," + recordToGet;
+        System.out.println("Generated SQL: " + sql); // Debugging line
         dbrs = DBHandler.execQueryResult(sql);
         ResultSet rs = dbrs.getResultSet();
         while (rs.next()) {
@@ -146,13 +151,12 @@ public class PstRegionalTax extends DBHandler implements I_DBInterface, I_DBType
             lists.add(regionalTax);
         }
     } catch (Exception e) {
-        System.out.println(e);
+        e.printStackTrace(); // Better error handling
     } finally {
         DBResultSet.close(dbrs);
     }
     return lists;
 }
-
 
     public static void resultToObject(ResultSet rs, RegionalTax regionalTax) {
     try {
@@ -203,6 +207,13 @@ public class PstRegionalTax extends DBHandler implements I_DBInterface, I_DBType
         }
         return result;
     }
+    
+        public static Vector<RegionalTax> searchByName(String name) {
+        Vector<RegionalTax> list = new Vector<>();
+        // Implementasi pencarian
+        return list;
+    }
+
 
     public long fetchExc(Entity ent) throws Exception {
         RegionalTax regionaltax = fetchExc(ent.getOID());
