@@ -7,13 +7,11 @@
 <html>
 <head>
     <title>Daftar Pajak Daerah</title>
-    <!-- Link ke FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Link ke SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: poppins, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
@@ -104,31 +102,11 @@
             text-decoration: underline;
         }
     </style>
-    <script>
-        // Fungsi untuk menampilkan konfirmasi SweetAlert sebelum menghapus
-        function confirmDelete(id) {
-            Swal.fire({
-                title: 'Apakah Anda yakin?',
-                text: "Data yang dihapus tidak dapat dikembalikan!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Ya, hapus!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Redirect ke URL penghapusan jika dikonfirmasi
-                    window.location.href = 'regional_tax_list.jsp?id=' + id;
-                }
-            })
-        }
-    </script>
 </head>
 <body>
     <div class="container">
         <h1>Daftar Pajak Daerah</h1>
 
-        <!-- Form pencarian -->
         <div class="actions">
             <form method="get" action="regional_tax_list.jsp">
                 <input type="text" name="search" placeholder="Cari berdasarkan nama" value="<%= request.getParameter("search") != null ? request.getParameter("search") : "" %>">
@@ -139,17 +117,15 @@
                 <a href="print_regional_tax.jsp"><i class="fas fa-print"></i> Cetak</a>
             </div>
         </div>
-
-        <!-- Handling deletion of a regional tax entry -->
         <% 
             String idParam = request.getParameter("id");
+            String deleteSuccess = request.getParameter("deleteSuccess");
             if (idParam != null) {
                 try {
                     long id = Long.parseLong(idParam);
                     int result = PstRegionalTax.deleteById(id);
                     if (result > 0) {
-                        // Redirect to the list page to refresh the view
-                        response.sendRedirect("regional_tax_list.jsp");
+                        response.sendRedirect("regional_tax_list.jsp?deleteSuccess=true");
                     } else {
                         out.println("<p>Data pajak daerah dengan ID " + id + " tidak ditemukan.</p>");
                     }
@@ -163,11 +139,20 @@
             }
         %>
 
-
+        <% if ("true".equals(deleteSuccess)) { %>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Data berhasil dihapus',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            </script>
+        <% } %>
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>No</th>
                     <th>Nama Daerah</th>
                     <th>Kode Daerah</th>
                     <th>Deskripsi</th>
@@ -178,20 +163,19 @@
                 <% 
                     String search = request.getParameter("search");
                     Vector<RegionalTax> regionalTaxes;
+                    int nomor = 1;
 
                     if (search != null && !search.trim().isEmpty()) {
                         String whereClause = "nama_daerah LIKE '%" + search + "%'";
-                        // Mengubah batas maksimal hasil pencarian menjadi 100
                         regionalTaxes = PstRegionalTax.list(0, 100, whereClause, "nama_daerah ASC");
                     } else {
-                        // Tetap mengambil 100 data jika tidak ada pencarian
                         regionalTaxes = PstRegionalTax.list(0, 100, null, "nama_daerah ASC");
                     }
 
                     for (RegionalTax regionalTax : regionalTaxes) {
                 %>
                 <tr>
-                    <td><%= regionalTax.getId() %></td>
+                    <td><%= nomor++ %></td>
                     <td><%= regionalTax.getName() %></td>
                     <td><%= regionalTax.getCode() %></td>
                     <td><%= regionalTax.getDescription() %></td>
@@ -204,5 +188,23 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak dapat dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'regional_tax_list.jsp?id=' + id;
+                }
+            })
+        }
+    </script>
 </body>
 </html>
