@@ -1,3 +1,8 @@
+<%-- 
+    Document   : list_tax_types
+    Created on : Sep 4, 2024, 3:49:25 PM
+    Author     : ihsan
+--%>
 <%@ page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="com.dimata.entity.pajak.TaxType" %>

@@ -3,27 +3,30 @@ package com.dimata.form.pajak;
 import com.dimata.qdep.form.FRMHandler;
 import com.dimata.qdep.form.I_FRMInterface;
 import com.dimata.qdep.form.I_FRMType;
-import com.dimata.entity.pajak.TaxType;
-
 import javax.servlet.http.HttpServletRequest;
-
+import com.dimata.entity.pajak.TaxType;
+/**
+ *
+ * @author ihsan
+ */
 public class FrmTaxType extends FRMHandler implements I_FRMInterface, I_FRMType {
+
     private TaxType taxType;
 
-    public static final String FRM_NAME_TAX_TYPE = "FRM_NAME_TAX_TYPE";
+    public static final String FRM_TAX_TYPE = "FRM_TAX_TYPE";
 
     public static final int FRM_FIELD_ID = 0;
     public static final int FRM_FIELD_NAME = 1;
     public static final int FRM_FIELD_DESCRIPTION = 2;
 
     public static String[] fieldNames = {
-        "FRM_FIELD_ID",
+       "FRM_FIELD_ID",
         "FRM_FIELD_NAME",
         "FRM_FIELD_DESCRIPTION"
     };
 
     public static int[] fieldTypes = {
-        TYPE_LONG,
+        TYPE_INT + ENTRY_REQUIRED,
         TYPE_STRING + ENTRY_REQUIRED,
         TYPE_STRING
     };
@@ -41,13 +44,13 @@ public class FrmTaxType extends FRMHandler implements I_FRMInterface, I_FRMType 
     }
 
     @Override
-    public String getFormName() {
-        return FRM_NAME_TAX_TYPE;
+    public int getFieldSize() {
+        return fieldNames.length;
     }
 
     @Override
-    public int[] getFieldTypes() {
-        return fieldTypes;
+    public String getFormName() {
+        return FRM_TAX_TYPE;
     }
 
     @Override
@@ -56,8 +59,8 @@ public class FrmTaxType extends FRMHandler implements I_FRMInterface, I_FRMType 
     }
 
     @Override
-    public int getFieldSize() {
-        return fieldNames.length;
+    public int[] getFieldTypes() {
+        return fieldTypes;
     }
 
     public TaxType getEntityObject() {
