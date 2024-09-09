@@ -1,183 +1,124 @@
-<%-- 
-    Document   : list_tax_types
-    Created on : Sep 4, 2024, 3:49:25 PM
-    Author     : ihsan
---%>
-<%@ page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List" %>
-<%@ page import="com.dimata.entity.pajak.TaxType" %>
-<%@ page import="com.dimata.entity.pajak.PstTaxType" %>
-<%@ page import="com.dimata.qdep.db.DBException" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.Vector"%>
+<%@page import="com.dimata.entity.pajak.TaxType"%>
+<%@page import="com.dimata.entity.pajak.PstTaxType"%>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Daftar Jenis Pajak</title>
+    <meta charset="UTF-8">
+    <title>Daftar Tipe Pajak</title>
     <style>
-        /* Styling umum */
-        body {
-            font-family: 'Comic Sans MS', sans-serif;
-            background: linear-gradient(45deg, #ff9a9e 0%, #fecfef 99%, #fe99ff 100%);
+        /* Ensuring styles are consistent with the index design */
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f9;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .main-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        .main-content {
+            flex: 1;
+            background-color: #fff;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .main-content h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
             color: #333;
-            margin: 0;
-            padding: 0;
+            font-weight: 400;
         }
-
-        /* Header */
-        header {
-            background-color: #ff6f61;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            margin: 0;
-            font-size: 2.5em;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px #d64f4f;
-        }
-
-        /* Konten utama */
-        main {
-            padding: 20px;
-        }
-
-        /* Tabel */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 30px;
         }
-
         table, th, td {
-            border: 2px solid #ff6f61;
+            border: 1px solid #ddd;
         }
-
         th, td {
-            padding: 15px;
-            text-align: center;
-            background-color: #ffede0;
-            color: #333;
-            font-size: 1.1em;
+            padding: 12px;
+            text-align: left;
         }
-
         th {
-            background-color: #ff6f61;
+            background-color: #3a5ba0;
             color: white;
-            font-size: 1.3em;
-            text-shadow: 1px 1px #d64f4f;
         }
-
         tr:nth-child(even) {
-            background-color: #ffe8d1;
+            background-color: #f9f9f9;
         }
-
         tr:hover {
-            background-color: #ffd1a4;
+            background-color: #f1f1f1;
         }
-
-        /* Tombol Hapus */
-        .delete-btn {
-            background-color: #ff6f61;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            text-shadow: 1px 1px #d64f4f;
-        }
-
-        .delete-btn:hover {
-            background-color: #ff5a4f;
-        }
-
-        /* Pesan */
-        p {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 10px solid #28a745;
-            padding: 15px;
+        .no-data {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
             border-radius: 8px;
-        }
-
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 10px solid #dc3545;
-            padding: 15px;
-            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Daftar Jenis Pajak</h1>
-    </header>
-    <main>
-        <%
-            // Mengambil parameter deleteId jika ada
-            String deleteIdStr = request.getParameter("deleteId");
-            if (deleteIdStr != null && !deleteIdStr.isEmpty()) {
-                try {
-                    long deleteId = Long.parseLong(deleteIdStr);
-                    if (deleteId > 0) {
-                        int result = PstTaxType.deleteById(deleteId);
-                        if (result > 0) {
-                            out.println("<p class='success-message'>Data pajak dengan ID " + deleteId + " berhasil dihapus.</p>");
+
+    <div class="main-content-wrapper">
+        <div class="main-content">
+            <h1>Daftar Tipe Pajak</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Pajak</th>
+                        <th>Deskripsi</th>
+                        <th>Tarif</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        // Mendapatkan data dari database menggunakan PstTaxType
+                        Vector taxTypeList = PstTaxType.listAll(0, 0, null, "tax_type_id ASC");
+
+                        if (taxTypeList != null && taxTypeList.size() > 0) {
+                            // Iterasi melalui daftar tipe pajak
+                            for (int i = 0; i < taxTypeList.size(); i++) {
+                                TaxType taxType = (TaxType) taxTypeList.get(i);
+                    %>
+                    <tr>
+                        <td><%= taxType.getTaxTypeId() %></td>
+                        <td><%= taxType.getNamaPajak() %></td>
+                        <td><%= taxType.getDeskripsi() %></td>
+                        <td><%= taxType.getTarif() %></td>
+                    </tr>
+                    <%
+                            }
                         } else {
-                            out.println("<p class='error-message'>Gagal menghapus data pajak dengan ID " + deleteId + ".</p>");
+                    %>
+                    <tr>
+                        <td colspan="4" class="no-data">Tidak ada data ditemukan</td>
+                    </tr>
+                    <%
                         }
-                    } else {
-                        out.println("<p class='error-message'>ID tidak valid.</p>");
-                    }
-                } catch (DBException e) {
-                    out.println("<p class='error-message'>Gagal menghapus data pajak: " + e.getMessage() + "</p>");
-                } catch (NumberFormatException e) {
-                    out.println("<p class='error-message'>ID tidak valid.</p>");
-                }
-            }
+                    %>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-            // Menampilkan daftar jenis pajak
-            List<TaxType> taxTypes = PstTaxType.list(0, 100, null, "id_jenis_pajak ASC");
-        %>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nama Pajak</th>
-                    <th>Deskripsi</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%
-                    for (TaxType taxType : taxTypes) {
-                %>
-                <tr>
-                    <td><%= taxType.getId() %></td>
-                    <td><%= taxType.getName() %></td>
-                    <td><%= taxType.getDescription() %></td>
-                    <td>
-                        <!-- Tombol Delete dengan parameter ID -->
-                        <form method="post" action="">
-                            <input type="hidden" name="deleteId" value="<%= taxType.getId() %>">
-                            <button type="submit" class="delete-btn">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-                <% } %>
-            </tbody>
-        </table>
-    </main>
 </body>
 </html>

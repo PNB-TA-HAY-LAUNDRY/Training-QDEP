@@ -5,37 +5,59 @@
 package com.dimata.entity.pajak;
 
 import com.dimata.qdep.entity.*;
-
+import java.math.BigDecimal;
 /**
  *
  * @author ihsan
  */
+
+
 public class TaxType extends Entity {
-    private long id;
-    private String name = "";
-    private String description = "";
 
-    public long getId() {
-        return id;
+    private long taxTypeId = 0;
+    private String namaPajak = "";
+    private String deskripsi = "";
+    private BigDecimal tarif;
+
+    public TaxType() {
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public TaxType(String namaPajak, String deskripsi, BigDecimal tarif) {
+        this.namaPajak = namaPajak;
+        this.deskripsi = deskripsi;
+        this.tarif = tarif;
     }
 
-    public String getName() {
-        return name;
+    // Getters and Setters
+    public long getTaxTypeId() {
+        return taxTypeId;
     }
 
-    public void setName(String name) {
-        this.name = name != null ? name : "";
+    public void setTaxTypeId(long taxTypeId) {
+        this.taxTypeId = taxTypeId;
     }
 
-    public String getDescription() {
-        return description;
+    public String getNamaPajak() {
+        return namaPajak;
     }
 
-    public void setDescription(String description) {
-        this.description = description != null ? description : "";
+    public void setNamaPajak(String namaPajak) {
+        this.namaPajak = namaPajak;
+    }
+
+    public String getDeskripsi() {
+        return deskripsi;
+    }
+
+    public void setDeskripsi(String deskripsi) {
+        this.deskripsi = deskripsi;
+    }
+
+    public BigDecimal getTarif() {
+        return tarif;
+    }
+
+    public void setTarif(BigDecimal tarif) {
+        this.tarif = tarif;
     }
 }

@@ -13,25 +13,60 @@ import java.util.*;
 
 public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_PersintentExc, I_Language {
 
-    public static final String TBL_TAX_TYPE = "jenispajak";
+    public static final String TBL_TAX_TYPE = "tax_types";
 
     public static final int FLD_TAX_TYPE_ID = 0;
-    public static final int FLD_NAME = 1;
+    public static final int FLD_NAME_TAX = 1;
     public static final int FLD_DESCRIPTION = 2;
+    public static final int FLD_TARIF = 3;
 
     public static final String[] fieldNames = {
-        "id_jenis_pajak",
+        "tax_type_id",
         "nama_pajak",
-        "deskripsi"
+        "deskripsi",
+        "tarif"
     };
 
     public static final int[] fieldTypes = {
         TYPE_LONG + TYPE_PK + TYPE_ID,
         TYPE_STRING,
-        TYPE_STRING
+        TYPE_STRING,
+        TYPE_FLOAT
     };
 
-    public PstTaxType() {
+    // Default constructor
+    public PstTaxType(){
+    }
+    
+    // Constructor to instantiate with an integer (could be used for querying)
+    public PstTaxType(int i) throws DBException {
+        super(new PstTaxType());
+    }
+
+    // Constructor that initializes the entity with a string OID (Object ID)
+    public PstTaxType(String sOid) throws DBException {
+        super(new PstTaxType(0));
+        if (!locate(sOid)) {
+            throw new DBException(this, DBException.RECORD_NOT_FOUND);
+        } else {
+            return;
+        }
+    }
+
+    // Constructor that initializes the entity with a long OID
+    public PstTaxType(long lOid) throws DBException {
+        super(new PstTaxType(0));
+        String sOid = "0";
+        try {
+            sOid = String.valueOf(lOid);
+        } catch (Exception e) {
+            throw new DBException(this, DBException.RECORD_NOT_FOUND);
+        }
+        if (!locate(sOid)) {
+            throw new DBException(this, DBException.RECORD_NOT_FOUND);
+        } else {
+            return;
+        }
     }
 
     @Override
@@ -54,154 +89,197 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
         return fieldTypes;
     }
 
+     @Override
     public String getPersistentName() {
         return new PstTaxType().getClass().getName();
     }
-
-    public long insertExc(TaxType taxType) throws DBException {
-        try {
-            PstTaxType pstTaxType = new PstTaxType();
-            pstTaxType.setString(FLD_NAME, taxType.getName());
-            pstTaxType.setString(FLD_DESCRIPTION, taxType.getDescription());
-            pstTaxType.insert();
-            taxType.setOID(pstTaxType.getlong(FLD_TAX_TYPE_ID));
-        } catch (Exception e) {
-            throw new DBException(this, DBException.UNKNOWN);
-        }
-        return taxType.getOID();
-    }
-
-    public long updateExc(TaxType taxType) throws DBException {
-        try {
-            if (taxType.getOID() != 0) {
-                PstTaxType pstTaxType = new PstTaxType();
-                pstTaxType.setString(FLD_NAME, taxType.getName());
-                pstTaxType.setString(FLD_DESCRIPTION, taxType.getDescription());
-                pstTaxType.update();
-                return taxType.getOID();
-            }
-        } catch (Exception e) {
-            throw new DBException(this, DBException.UNKNOWN);
-        }
-        return 0;
-    }
-
-    public long deleteExc(long oid) throws DBException {
-        try {
-            PstTaxType pstTaxType = new PstTaxType();
-            pstTaxType.delete();
-        } catch (Exception e) {
-            throw new DBException(this, DBException.UNKNOWN);
-        }
-        return oid;
-    }
-
-    public static TaxType fetchExc(long oid) throws DBException {
-        try {
-            TaxType taxType = new TaxType();
-            PstTaxType pstTaxType = new PstTaxType();
-            taxType.setOID(oid);
-            taxType.setName(pstTaxType.getString(FLD_NAME));
-            taxType.setDescription(pstTaxType.getString(FLD_DESCRIPTION));
-            return taxType;
-        } catch (Exception e) {
-            throw new DBException(new PstTaxType(), DBException.UNKNOWN);
-        }
-    }
-
-    public static Vector<TaxType> list(int limitStart, int recordToGet, String whereClause, String order) {
-        Vector<TaxType> lists = new Vector<>();
-        DBResultSet dbrs = null;
-        try {
-            String sql = "SELECT * FROM " + TBL_TAX_TYPE;
-            if (whereClause != null && !whereClause.isEmpty()) {
-                sql += " WHERE " + whereClause;
-            }
-            if (order != null && !order.isEmpty()) {
-                sql += " ORDER BY " + order;
-            }
-            sql += " LIMIT " + limitStart + "," + recordToGet;
-            dbrs = DBHandler.execQueryResult(sql);
-            ResultSet rs = dbrs.getResultSet();
-            while (rs.next()) {
-                TaxType taxType = new TaxType();
-                resultToObject(rs, taxType);
-                lists.add(taxType);
-            }
-        } catch (Exception e) {
-            System.out.println("Error: " + e);
-        } finally {
-            DBResultSet.close(dbrs);
-        }
-        return lists;
-    }
-
-    public static void resultToObject(ResultSet rs, TaxType taxType) {
-        try {
-            taxType.setId(rs.getLong(fieldNames[FLD_TAX_TYPE_ID]));
-            taxType.setName(rs.getString(fieldNames[FLD_NAME]));
-            taxType.setDescription(rs.getString(fieldNames[FLD_DESCRIPTION]));
-        } catch (Exception e) {
-            System.out.println("Error: " + e);
-        }
-    }
-
-    public static int deleteById(long id) throws DBException {
-        Connection connection = null;
-        Statement statement = null;
-        int result = -1;
-        try {
-            connection = DBHandler.getConnection();
-            statement = connection.createStatement();
-            String sql = "DELETE FROM " + TBL_TAX_TYPE + " WHERE " + fieldNames[FLD_TAX_TYPE_ID] + " = " + id;
-            result = statement.executeUpdate(sql);
-            if (result == 0) {
-                throw new DBException(new PstTaxType(), DBException.RECORD_NOT_FOUND);
-            }
-        } catch (SQLException sqlexception) {
-            sqlexception.printStackTrace(System.err);
-            throw new DBException(new PstTaxType(), sqlexception);
-        } finally {
-            closeStatement(statement);
-            closeConnection(connection);
-        }
-        return result;
-    }
-
-    public static boolean checkOID(long taxTypeId) {
-        DBResultSet dbrs = null;
-        boolean result = false;
-        try {
-            String sql = "SELECT * FROM " + TBL_TAX_TYPE + " WHERE " + fieldNames[FLD_TAX_TYPE_ID] + " = " + taxTypeId;
-            dbrs = DBHandler.execQueryResult(sql);
-            ResultSet rs = dbrs.getResultSet();
-            result = rs.next();
-        } catch (Exception e) {
-            System.out.println("err : " + e);
-        } finally {
-            DBResultSet.close(dbrs);
-        }
-        return result;
-    }
-
-    public long fetchExc(Entity ent) throws Exception {
-        TaxType taxtype = fetchExc(ent.getOID());
-        ent = (Entity) taxtype;
-        return taxtype.getOID();
-    }
-
+    
+    @Override
     public long insertExc(Entity ent) throws Exception {
         return insertExc((TaxType) ent);
     }
 
+    public long insertExc(TaxType taxType) throws DBException {
+        try {
+            PstTaxType pstTaxType = new PstTaxType(0);
+            pstTaxType.setString(FLD_NAME_TAX, taxType.getNamaPajak());
+            pstTaxType.setString(FLD_DESCRIPTION, taxType.getDeskripsi());
+            pstTaxType.setDouble(FLD_TARIF, taxType.getTarif().doubleValue());
+        } catch (DBException dbe) {
+            throw dbe;
+        } catch (Exception e) {
+            throw new DBException(new PstTaxType(taxType.getOID()), DBException.UNKNOWN);
+        }
+        return taxType.getOID();
+    }
+
+    // Update an AssetList entity in the database
+    @Override
     public long updateExc(Entity ent) throws Exception {
         return updateExc((TaxType) ent);
     }
+    
+    public long updateExc(TaxType taxType) throws DBException {
+        try {
+            if (taxType.getOID() != 0) {
+                PstTaxType pstTaxType = new PstTaxType(taxType.getOID());
+                pstTaxType.setString(FLD_NAME_TAX, taxType.getNamaPajak());
+                pstTaxType.setString(FLD_DESCRIPTION, taxType.getDeskripsi());
+                pstTaxType.update();
+                return taxType.getOID();
+            }
+        } catch (DBException dbe) {
+            throw dbe;
+        } catch (Exception e) {
+            throw new DBException(new PstTaxType(0), DBException.UNKNOWN);
+        }
+        return 0;
+    }
 
+     // Deletes an AssetList entity from the database
+    @Override
     public long deleteExc(Entity ent) throws Exception {
-        if (ent == null) {
+       if (ent == null) {
             throw new DBException(this, DBException.RECORD_NOT_FOUND);
         }
         return deleteExc(ent.getOID());
+    }
+    
+    public long deleteExc(long oid) throws DBException {
+        try {
+            PstTaxType pstTaxType = new PstTaxType(oid);
+            pstTaxType.delete();
+        } catch (DBException dbe) {
+            throw dbe;
+        } catch (Exception e) {
+            throw new DBException(new PstTaxType(0), DBException.UNKNOWN);
+        }
+        return oid;
+    }
+
+    // Fetches an AssetList entity from the database using its OID
+    @Override
+    public long fetchExc(Entity ent) throws Exception {
+        TaxType taxType = fetchExc(ent.getOID());
+        ent = (Entity) taxType;
+        return taxType.getOID();
+    }
+    
+    public static TaxType fetchExc(long oid) throws DBException {
+        try {
+            TaxType taxType = new TaxType();
+            PstTaxType pstTaxType = new PstTaxType(oid);
+            taxType.setOID(oid);
+            taxType.setTaxTypeId(pstTaxType.getlong(FLD_TAX_TYPE_ID));
+            taxType.setNamaPajak(pstTaxType.getString(FLD_NAME_TAX));
+            taxType.setDeskripsi(pstTaxType.getString(FLD_DESCRIPTION));
+            return taxType;
+        } catch (DBException dbe) {
+            throw dbe;
+        } catch (Exception e) {
+            throw new DBException(new PstTaxType(0), DBException.UNKNOWN);
+        }
+    }
+
+    public static Vector listAll(int limitStart, int recordToGet, String whereClause, String order) {
+    return list(limitStart, recordToGet, whereClause, order, null);
+}
+
+public static Vector list(int limitStart, int recordToGet, String whereClause, String order, String join) {
+    Vector lists = new Vector();
+    DBResultSet dbrs = null;
+    try {
+        String sql = "SELECT * FROM " + TBL_TAX_TYPE;
+
+        if (join != null && !join.isEmpty()) {
+            sql += " JOIN " + join;
+        }
+
+        if (whereClause != null && whereClause.length() > 0) {
+            sql += " WHERE " + whereClause;
+        }
+
+        if (order != null && order.length() > 0) {
+            sql += " ORDER BY " + order;
+        }
+
+        // Handle limit and offset based on the DB server type
+        switch (DBHandler.DBSVR_TYPE) {
+            case DBHandler.DBSVR_MYSQL:
+            case DBHandler.DBSVR_POSTGRESQL:
+                if (limitStart >= 0 && recordToGet > 0) {
+                    sql += " LIMIT " + recordToGet + " OFFSET " + limitStart;
+                }
+                break;
+
+            case DBHandler.DBSVR_SYBASE:
+            case DBHandler.DBSVR_ORACLE:
+            case DBHandler.DBSVR_MSSQL:
+                // Implement if needed for other DBs
+                break;
+
+            default:
+                break;
+        }
+
+        // Execute the query
+        dbrs = DBHandler.execQueryResult(sql);
+        ResultSet rs = dbrs.getResultSet();
+        
+        // Extract data from the result set
+        while (rs.next()) {
+            TaxType taxType = new TaxType();
+            resultToObject(rs, taxType);
+            lists.add(taxType);
+        }
+        
+        rs.close(); // Ensure the ResultSet is closed after processing
+        return lists;
+
+    } catch (Exception e) {
+        System.out.println("Error: " + e);
+    } finally {
+        DBResultSet.close(dbrs); // Ensure the DBResultSet is closed in finally block
+    }
+    return new Vector();
+}
+
+
+    public static void resultToObject(ResultSet rs, TaxType taxType) {
+        try {
+            taxType.setTaxTypeId(rs.getLong(PstTaxType.fieldNames[PstTaxType.FLD_TAX_TYPE_ID]));
+            taxType.setNamaPajak(rs.getString(PstTaxType.fieldNames[PstTaxType.FLD_NAME_TAX]));
+            taxType.setDeskripsi(rs.getString(PstTaxType.fieldNames[PstTaxType.FLD_DESCRIPTION]));
+            taxType.setTarif(rs.getBigDecimal(PstTaxType.fieldNames[PstTaxType.FLD_TARIF]));
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
+    // Checks if an asset condition exists in the database based on name and type
+    public static boolean checkAsset(String name, int type) {
+        DBResultSet dbrs = null;
+        boolean result = false;
+        try {
+            String sql = "";
+
+            if (type == 1) {// check asset name
+                sql = "SELECT * FROM " + TBL_TAX_TYPE + " WHERE "
+                        + PstTaxType.fieldNames[PstTaxType.FLD_NAME_TAX] + " = '" + name + "'";
+            }
+
+            dbrs = DBHandler.execQueryResult(sql);
+            ResultSet rs = dbrs.getResultSet();
+
+            while (rs.next()) {
+                result = true;
+            }
+            rs.close();
+        } catch (Exception e) {
+            System.out.println("err : " + e.toString());
+        } finally {
+            DBResultSet.close(dbrs);
+        }
+        return result;
     }
 }
