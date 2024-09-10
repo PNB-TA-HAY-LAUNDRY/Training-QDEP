@@ -257,7 +257,7 @@ public static Vector list(int limitStart, int recordToGet, String whereClause, S
     }
 
     // Checks if an asset condition exists in the database based on name and type
-    public static boolean checkAsset(String name, int type) {
+    public static boolean checkTaxType(String name, int type) {
         DBResultSet dbrs = null;
         boolean result = false;
         try {

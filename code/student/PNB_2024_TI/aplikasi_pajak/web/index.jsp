@@ -269,6 +269,7 @@
                 <a href="#" data-page="pajak_balik_nama.jsp">Vehicle Transfer Tax</a>
                 <a href="#" data-page="pajak_bahan_bakar.jsp">Fuel Tax</a>
                 <a href="#" data-page="pajak_air.jsp">Water Tax</a>
+                <a href="#" data-page="pajak_rokok.jsp">Cigarette Tax</a>
             </div>
         </div>
         <div class="main-content-wrapper">
