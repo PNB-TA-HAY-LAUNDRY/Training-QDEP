@@ -1,5 +1,6 @@
 package com.dimata.entity.pajak;
 
+import static com.dimata.entity.pajak.PstTaxOwnership.TBL_TAX_OWNER;
 import com.dimata.qdep.db.DBException;
 import com.dimata.qdep.db.DBHandler;
 import com.dimata.qdep.db.DBResultSet;
@@ -28,8 +29,8 @@ public class PstTaxVehicle extends DBHandler implements I_DBInterface, I_DBType,
     public static final int FLD_TAX_TYPE_ID = 7;
     public static final int FLD_JUMLAH_PAJAK = 8;
     public static final int FLD_PERIODE_PAJAK = 9;
-    public static final int FLD_STATUS_PEMBAYARAN = 10;
-    public static final int FLD_TANGGAL_JATUH_TEMPO = 11;
+    public static final int FLD_TANGGAL_JATUH_TEMPO = 10;
+    public static final int FLD_STATUS_PEMBAYARAN = 11;
     public static final int FLD_TANGGAL_PEMBAYARAN = 12;
     
     public static final String[] fieldNames = {
@@ -43,8 +44,8 @@ public class PstTaxVehicle extends DBHandler implements I_DBInterface, I_DBType,
         "tax_type_id",
         "jumlah_pajak",
         "periode_pajak",
-        "status_pembayaran",
         "tanggal_jatuh_tempo",
+        "status_pembayaran",
         "tanggal_pembayaran"
     };
     
@@ -58,9 +59,9 @@ public class PstTaxVehicle extends DBHandler implements I_DBInterface, I_DBType,
         TYPE_INT, // tahun_pembuatan
         TYPE_LONG, // tax_type_id
         TYPE_FLOAT, // jumlah_pajak
-        TYPE_DATE, // periode_pajak
-        TYPE_STRING, // status_pembayaran
         TYPE_DATE, // tanggal_jatuh_tempo
+        TYPE_STRING,// periode_pajak
+        TYPE_STRING, // status_pembayaran                    
         TYPE_DATE // tanggal_pembayaran
     };
 
@@ -115,87 +116,7 @@ public class PstTaxVehicle extends DBHandler implements I_DBInterface, I_DBType,
     public String getPersistentName() {
         return new PstTaxVehicle().getClass().getName();
     }
-
-    @Override
-    public long insertExc(Entity ent) throws Exception {
-        return insertExc((TaxVehicle) ent);
-    }
-
-    public long insertExc(TaxVehicle taxVehicle) throws DBException {
-        try {
-            PstTaxVehicle pstTaxVehicle = new PstTaxVehicle(0);
-            pstTaxVehicle.setString(FLD_NO_PLAT, taxVehicle.getNoPlat());
-            pstTaxVehicle.setString(FLD_NAMA_PEMILIK, taxVehicle.getNamaPemilik());
-            pstTaxVehicle.setString(FLD_ALAMAT, taxVehicle.getAlamat());
-            pstTaxVehicle.setString(FLD_MERK, taxVehicle.getMerk());
-            pstTaxVehicle.setString(FLD_MODEL, taxVehicle.getModel());
-            pstTaxVehicle.setInt(FLD_TAHUN_PEMBUATAN, taxVehicle.getTahunPembuatan());
-            pstTaxVehicle.setLong(FLD_TAX_TYPE_ID, taxVehicle.getTaxType().getOID());
-            pstTaxVehicle.setDouble(FLD_JUMLAH_PAJAK, taxVehicle.getJumlahPajak());
-            pstTaxVehicle.setDate(FLD_PERIODE_PAJAK, taxVehicle.getPeriodePajak());
-            pstTaxVehicle.setString(FLD_STATUS_PEMBAYARAN, taxVehicle.getStatusPembayaran().name()); // Enum to String
-            pstTaxVehicle.setDate(FLD_TANGGAL_JATUH_TEMPO, taxVehicle.getTanggalJatuhTempo());
-            pstTaxVehicle.setDate(FLD_TANGGAL_PEMBAYARAN, taxVehicle.getTanggalPembayaran());
-        } catch (DBException dbe) {
-            throw dbe;
-        } catch (Exception e) {
-            throw new DBException(new PstTaxVehicle(0), DBException.UNKNOWN);
-        }
-        return taxVehicle.getOID();
-    }
-
-//    @Override
-//    public long updateExc(Entity ent) throws Exception {
-//        return updateExc((TaxVehicle) ent);
-//    }
-//
-//    public long updateExc(TaxVehicle taxVehicle) throws DBException {
-//        try {
-//            if (taxVehicle.getOID() != 0) {
-//                PstTaxVehicle pstTaxVehicle = new PstTaxVehicle(taxVehicle.getOID());
-//                pstTaxVehicle.setString(FLD_NO_PLAT, taxVehicle.getNoPlat());
-//                pstTaxVehicle.setString(FLD_NAMA_PEMILIK, taxVehicle.getNamaPemilik());
-//                pstTaxVehicle.setString(FLD_ALAMAT, taxVehicle.getAlamat());
-//                pstTaxVehicle.setString(FLD_MERK, taxVehicle.getMerk());
-//                pstTaxVehicle.setString(FLD_MODEL, taxVehicle.getModel());
-//                pstTaxVehicle.setInt(FLD_TAHUN_PEMBUATAN, taxVehicle.getTahunPembuatan());
-//                pstTaxVehicle.setLong(FLD_TAX_TYPE_ID, taxVehicle.getTaxType().getOID());
-//                pstTaxVehicle.setDouble(FLD_JUMLAH_PAJAK, taxVehicle.getJumlahPajak());
-//                pstTaxVehicle.setDate(FLD_PERIODE_PAJAK, taxVehicle.getPeriodePajak());
-//                pstTaxVehicle.setString(FLD_STATUS_PEMBAYARAN, taxVehicle.getStatusPembayaran().name()); // Enum to String
-//                pstTaxVehicle.setDate(FLD_TANGGAL_JATUH_TEMPO, taxVehicle.getTanggalJatuhTempo());
-//                pstTaxVehicle.setDate(FLD_TANGGAL_PEMBAYARAN, taxVehicle.getTanggalPembayaran());
-//                pstTaxVehicle.update();
-//                return taxVehicle.getOID();
-//            }
-//        } catch (DBException dbe) {
-//            throw dbe;
-//        } catch (Exception e) {
-//            throw new DBException(new PstTaxVehicle(0), DBException.UNKNOWN);
-//        }
-//        return 0;
-//    }
-//
-//    @Override
-//    public long deleteExc(Entity ent) throws Exception {
-//        if (ent == null) {
-//            throw new DBException(this, DBException.RECORD_NOT_FOUND);
-//        }
-//        return deleteExc(ent.getOID());
-//    }
-
-//    public long deleteExc(long oid) throws DBException {
-//        try {
-//            PstTaxVehicle pstTaxVehicle = new PstTaxVehicle(oid);
-//            pstTaxVehicle.delete();
-//        } catch (DBException dbe) {
-//            throw dbe;
-//        } catch (Exception e) {
-//            throw new DBException(new PstTaxVehicle(0), DBException.UNKNOWN);
-//        }
-//        return oid;
-//    }
-
+    
     @Override
     public long fetchExc(Entity ent) throws Exception {
         TaxVehicle taxVehicle = fetchExc(ent.getOID());
@@ -203,37 +124,74 @@ public class PstTaxVehicle extends DBHandler implements I_DBInterface, I_DBType,
         return taxVehicle.getOID();
     }
 
-    public static TaxVehicle fetchExc(long oid) throws DBException {
-        try {
-            TaxVehicle taxVehicle = new TaxVehicle();
-            PstTaxVehicle pstTaxVehicle = new PstTaxVehicle(oid);
-            taxVehicle.setOID(oid);
-            taxVehicle.setVehicleTaxId(pstTaxVehicle.getlong(FLD_VEHICLE_TAX_ID));
-            taxVehicle.setNoPlat(pstTaxVehicle.getString(FLD_NO_PLAT));
-            taxVehicle.setNamaPemilik(pstTaxVehicle.getString(FLD_NAMA_PEMILIK));
-            taxVehicle.setAlamat(pstTaxVehicle.getString(FLD_ALAMAT));
-            taxVehicle.setMerk(pstTaxVehicle.getString(FLD_MERK));
-            taxVehicle.setModel(pstTaxVehicle.getString(FLD_MODEL));
-            taxVehicle.setTahunPembuatan(pstTaxVehicle.getInt(FLD_TAHUN_PEMBUATAN));
-            long taxTypeId = pstTaxVehicle.getlong(FLD_TAX_TYPE_ID);
-            TaxType taxType = new TaxType();
-            taxType.setOID(taxTypeId);
-            taxVehicle.setTaxType(taxType);
-            taxVehicle.setJumlahPajak(pstTaxVehicle.getdouble(FLD_JUMLAH_PAJAK));
-            taxVehicle.setPeriodePajak(pstTaxVehicle.getDate(FLD_PERIODE_PAJAK));
-            String statusPembayaranStr = pstTaxVehicle.getString(FLD_STATUS_PEMBAYARAN);
-            PaymentStatus statusPembayaran = PaymentStatus.valueOf(statusPembayaranStr.toUpperCase()); 
-            taxVehicle.setStatusPembayaran(statusPembayaran);
-            taxVehicle.setTanggalJatuhTempo(pstTaxVehicle.getDate(FLD_TANGGAL_JATUH_TEMPO));
-            taxVehicle.setTanggalPembayaran(pstTaxVehicle.getDate(FLD_TANGGAL_PEMBAYARAN));
-            return taxVehicle;
-        } catch (DBException dbe) {
-            throw dbe;
-        } catch (Exception e) {
-            throw new DBException(new PstTaxVehicle(0), DBException.UNKNOWN);
-        }
+    @Override
+    public long insertExc(Entity ent) throws Exception {
+        return insertExc((TaxVehicle) ent);
     }
-    
+
+public long insertExc(TaxVehicle taxVehicle) throws DBException {
+    try {
+        PstTaxVehicle pstTaxVehicle = new PstTaxVehicle(0);
+        pstTaxVehicle.setString(FLD_NO_PLAT, taxVehicle.getNoPlat());
+        pstTaxVehicle.setString(FLD_NAMA_PEMILIK, taxVehicle.getNamaPemilik());
+        pstTaxVehicle.setString(FLD_ALAMAT, taxVehicle.getAlamat());
+        pstTaxVehicle.setString(FLD_MERK, taxVehicle.getMerk());
+        pstTaxVehicle.setString(FLD_MODEL, taxVehicle.getModel());
+        pstTaxVehicle.setInt(FLD_TAHUN_PEMBUATAN, taxVehicle.getTahunPembuatan());
+        pstTaxVehicle.setLong(FLD_TAX_TYPE_ID, taxVehicle.getTaxType().getOID());
+        pstTaxVehicle.setDouble(FLD_JUMLAH_PAJAK, taxVehicle.getJumlahPajak());
+        pstTaxVehicle.setString(FLD_PERIODE_PAJAK, taxVehicle.getPeriodePajak());
+                pstTaxVehicle.setDate(FLD_TANGGAL_JATUH_TEMPO, taxVehicle.getTanggalJatuhTempo());
+        pstTaxVehicle.setString(FLD_STATUS_PEMBAYARAN, taxVehicle.getStatusPembayaran().getStatus()); // Enum to String
+        pstTaxVehicle.setDate(FLD_TANGGAL_PEMBAYARAN, taxVehicle.getTanggalPembayaran());
+    } catch (DBException dbe) {
+        throw dbe;
+    } catch (Exception e) {
+        throw new DBException(new PstTaxVehicle(0), DBException.UNKNOWN);
+    }
+    return taxVehicle.getOID();
+}
+
+public static TaxVehicle fetchExc(long oid) throws DBException {
+    try {
+        TaxVehicle taxVehicle = new TaxVehicle();
+        PstTaxVehicle pstTaxVehicle = new PstTaxVehicle(oid);
+        taxVehicle.setOID(oid);
+        taxVehicle.setVehicleTaxId(pstTaxVehicle.getlong(FLD_VEHICLE_TAX_ID));
+        taxVehicle.setNoPlat(pstTaxVehicle.getString(FLD_NO_PLAT));
+        taxVehicle.setNamaPemilik(pstTaxVehicle.getString(FLD_NAMA_PEMILIK));
+        taxVehicle.setAlamat(pstTaxVehicle.getString(FLD_ALAMAT));
+        taxVehicle.setMerk(pstTaxVehicle.getString(FLD_MERK));
+        taxVehicle.setModel(pstTaxVehicle.getString(FLD_MODEL));
+        taxVehicle.setTahunPembuatan(pstTaxVehicle.getInt(FLD_TAHUN_PEMBUATAN));
+
+        // Mengambil TaxType berdasarkan taxTypeId
+        long taxTypeId = pstTaxVehicle.getlong(FLD_TAX_TYPE_ID);
+        TaxType taxType = new TaxType();
+        taxType.setOID(taxTypeId);
+        taxVehicle.setTaxType(taxType);
+        
+        taxVehicle.setJumlahPajak(pstTaxVehicle.getdouble(FLD_JUMLAH_PAJAK));
+        taxVehicle.setPeriodePajak(pstTaxVehicle.getString(FLD_PERIODE_PAJAK));
+        
+                // Tetap menampilkan tanggal jatuh tempo, bahkan jika status pembayaran belum dibayar
+        taxVehicle.setTanggalJatuhTempo(pstTaxVehicle.getDate(FLD_TANGGAL_JATUH_TEMPO));
+        // Mengatur status pembayaran
+        String statusPembayaranStr = pstTaxVehicle.getString(FLD_STATUS_PEMBAYARAN);
+        PaymentStatus statusPembayaran = PaymentStatus.valueOf(statusPembayaranStr.toUpperCase());
+        taxVehicle.setStatusPembayaran(statusPembayaran);
+        
+        // Tanggal pembayaran bisa null jika belum dibayar
+        taxVehicle.setTanggalPembayaran(pstTaxVehicle.getDate(FLD_TANGGAL_PEMBAYARAN));
+        
+        return taxVehicle;
+    } catch (DBException dbe) {
+        throw dbe;
+    } catch (Exception e) {
+        throw new DBException(new PstTaxVehicle(0), DBException.UNKNOWN);
+    }
+}
+
     public static Vector listAll(int limitStart, int recordToGet, String whereClause, String order) {
     return list(limitStart, recordToGet, whereClause, order, null);
 }
@@ -312,18 +270,42 @@ public static void resultToObject(ResultSet rs, TaxVehicle TaxVehicle) {
         TaxVehicle.setTaxType(taxType); 
 
         TaxVehicle.setJumlahPajak(rs.getDouble(PstTaxVehicle.fieldNames[PstTaxVehicle.FLD_JUMLAH_PAJAK]));
-        TaxVehicle.setPeriodePajak(rs.getDate(PstTaxVehicle.fieldNames[PstTaxVehicle.FLD_PERIODE_PAJAK]));
-
+        TaxVehicle.setPeriodePajak(rs.getString(PstTaxVehicle.fieldNames[PstTaxVehicle.FLD_PERIODE_PAJAK]));
+        TaxVehicle.setTanggalJatuhTempo(rs.getDate(PstTaxVehicle.fieldNames[PstTaxVehicle.FLD_TANGGAL_JATUH_TEMPO]));
         String statusPembayaranStr = rs.getString(PstTaxVehicle.fieldNames[PstTaxVehicle.FLD_STATUS_PEMBAYARAN]);
         PaymentStatus statusPembayaran = PaymentStatus.valueOf(statusPembayaranStr.toUpperCase()); // Mengubah string menjadi enum PaymentStatus
         TaxVehicle.setStatusPembayaran(statusPembayaran);
-
-        TaxVehicle.setTanggalJatuhTempo(rs.getDate(PstTaxVehicle.fieldNames[PstTaxVehicle.FLD_TANGGAL_JATUH_TEMPO]));
         TaxVehicle.setTanggalPembayaran(rs.getDate(PstTaxVehicle.fieldNames[PstTaxVehicle.FLD_TANGGAL_PEMBAYARAN]));
     } catch (Exception e) {
         System.out.println("Error: " + e.getMessage());
     }
 }
+
+    public static boolean checkTaxVehicle(String no, int type) {
+        DBResultSet dbrs = null;
+        boolean result = false;
+        try {
+            String sql = "";
+
+            if (type == 1) {
+                sql = "SELECT * FROM " + TBL_TAX_VEHICLE + " WHERE "
+                        + PstTaxVehicle.fieldNames[PstTaxVehicle.FLD_NO_PLAT] + " = '" + no + "'";
+            }
+
+            dbrs = DBHandler.execQueryResult(sql);
+            ResultSet rs = dbrs.getResultSet();
+
+            while (rs.next()) {
+                result = true;
+            }
+            rs.close();
+        } catch (Exception e) {
+            System.out.println("err : " + e.toString());
+        } finally {
+            DBResultSet.close(dbrs);
+        }
+        return result;
+    }
 
     @Override
     public long updateExc(Entity ent) throws Exception {

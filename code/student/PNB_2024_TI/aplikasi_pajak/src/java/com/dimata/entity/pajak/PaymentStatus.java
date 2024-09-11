@@ -17,8 +17,13 @@ public enum PaymentStatus {
     PaymentStatus(String status) {
         this.status = status;
     }
-
-    public String getStatus() {
+    
+        public String getStatus() {
         return status;
     }
+
+  @Override
+  public String toString() {
+      return status;
+  }
 }

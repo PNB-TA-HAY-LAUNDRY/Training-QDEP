@@ -76,7 +76,6 @@
     </style>
 </head>
 <body>
-
     <div class="main-content-wrapper">
         <div class="main-content">
             <h1>Daftar Tipe Pajak</h1>

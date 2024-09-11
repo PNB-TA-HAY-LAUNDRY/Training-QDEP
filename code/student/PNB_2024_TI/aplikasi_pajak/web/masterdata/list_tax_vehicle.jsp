@@ -2,6 +2,7 @@
 <%@page import="java.util.Vector"%>
 <%@page import="com.dimata.entity.pajak.TaxVehicle"%>
 <%@page import="com.dimata.entity.pajak.PstTaxVehicle"%>
+<%@page import="com.dimata.entity.pajak.PaymentStatus"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
@@ -13,27 +14,35 @@
         html, body {
             height: 100%;
             margin: 0;
-            font-family: 'Arial', sans-serif;
-            background-color: #f9f9f9;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f9;
         }
         .container {
             display: flex;
             height: 100vh;
-            padding: 20px;
-            box-sizing: border-box;
         }
-        .content {
-            width: 100%;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .main-content-wrapper {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
         }
-        h1 {
+        .main-content {
+            flex: 1;
+            background-color: #fff;
+            padding: 30px;
+            margin: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .main-content h1 {
             font-size: 24px;
             margin-bottom: 20px;
             color: #333;
-            font-weight: 600;
+            font-weight: 400;
         }
         table {
             width: 100%;
@@ -43,18 +52,18 @@
             border: 1px solid #ddd;
         }
         th, td {
-            padding: 10px;
+            padding: 12px;
             text-align: left;
         }
         th {
-            background-color: #4CAF50;
+            background-color: #3a5ba0;
             color: white;
         }
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #f9f9f9;
         }
         tr:hover {
-            background-color: #ddd;
+            background-color: #f1f1f1;
         }
         .no-data {
             text-align: center;
@@ -63,7 +72,7 @@
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -85,15 +94,15 @@
                         <th>Jenis Pajak</th>
                         <th>Jumlah Pajak</th>
                         <th>Periode Pajak</th>
-                        <th>Status Pembayaran</th>
                         <th>Tanggal Jatuh Tempo</th>
+                        <th>Status Pembayaran</th>
                         <th>Tanggal Pembayaran</th>
                     </tr>
                 </thead>
                 <tbody>
                     <%
                         // Mendapatkan data dari database menggunakan PstTaxVehicle
-                        Vector taxVehicleList = PstTaxVehicle.listAll(0, 0, null, "vehicle_tax_records ASC");
+                        Vector taxVehicleList = PstTaxVehicle.listAll(0, 0, null, "vehicle_tax_id ASC");
 
                         if (taxVehicleList != null && taxVehicleList.size() > 0) {
                             // Iterasi melalui daftar pajak kendaraan
@@ -120,9 +129,9 @@
                         <td><%= taxTypeName %></td>
                         <td><%= taxVehicle.getJumlahPajak() %></td>
                         <td><%= taxVehicle.getPeriodePajak() %></td>
+                        <td><%= taxVehicle.getTanggalJatuhTempo()%></td>
                         <td><%= taxVehicle.getStatusPembayaran() %></td>
-                        <td><%= (taxVehicle.getTanggalJatuhTempo() != null) ? taxVehicle.getTanggalJatuhTempo() : "N/A" %></td>
-                        <td><%= (taxVehicle.getTanggalPembayaran() != null) ? taxVehicle.getTanggalPembayaran() : "Belum dibayar" %></td>
+                        <td><%= taxVehicle.getTanggalPembayaran() %></td>
                     </tr>
                     <%
                             }

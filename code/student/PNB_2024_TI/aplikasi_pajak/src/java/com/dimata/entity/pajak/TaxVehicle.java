@@ -16,7 +16,7 @@ public class TaxVehicle extends Entity {
     private int tahunPembuatan;
     private TaxType taxType;
     private double jumlahPajak;
-    private Date periodePajak;
+    private String periodePajak;
     private PaymentStatus statusPembayaran;
     private Date tanggalJatuhTempo;
     private Date tanggalPembayaran;
@@ -27,7 +27,7 @@ public class TaxVehicle extends Entity {
 
     public TaxVehicle(String noPlat, String namaPemilik, String alamat,
             String merk, String model, int tahunPembuatan, TaxType taxType,
-            Double jumlahPajak, Date periodePajak, PaymentStatus statusPembayaran,
+            Double jumlahPajak, String periodePajak, PaymentStatus statusPembayaran,
             Date tanggalJatuhTempo, Date tanggalPembayaran) {
         
         this.noPlat = noPlat;
@@ -118,11 +118,11 @@ public class TaxVehicle extends Entity {
         this.jumlahPajak = jumlahPajak;
     }
 
-    public Date getPeriodePajak() {
+    public String getPeriodePajak() {
         return periodePajak;
     }
 
-    public void setPeriodePajak(Date periodePajak) {
+    public void setPeriodePajak(String periodePajak) {
         this.periodePajak = periodePajak;
     }
 

@@ -1,7 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.Vector"%>
 <%@page import="com.dimata.entity.pajak.PaymentStatus"%>
-<%@page import="java.util.Vector"%>
 <%@page import="com.dimata.entity.pajak.TaxType"%>
 <%@page import="com.dimata.entity.pajak.TaxOwnership"%>
 <%@page import="com.dimata.entity.pajak.PstTaxOwnership"%>
@@ -129,7 +128,7 @@
                         <td><%= taxOwnership.getJumlahPajak() %></td>
                         <td><%= taxOwnership.getTanggalProses() %></td>
                         <td><%= taxOwnership.getTanggalJatuhTempo() %></td>
-                        <td><%= taxOwnership.getStatusPembayaran().name() %></td>
+                        <td><%= taxOwnership.getStatusPembayaran()%></td>
                         <td><%= taxOwnership.getTanggalPembayaran() %></td>
                     </tr>
                     <%
