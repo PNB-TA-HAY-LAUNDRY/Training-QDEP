@@ -9,7 +9,7 @@ import java.util.Date;
  *
  * @author ihsan
  */
-public class TaxOwnership extends Entity{
+public class TaxOwnership extends Entity {
     private long transferTaxId;
     private String noPlat;
     private String namaPemilikLama;
@@ -18,25 +18,19 @@ public class TaxOwnership extends Entity{
     private TaxType taxType;
     private double jumlahPajak;
     private Date tanggalProses;
-    private StatusPembayaran statusPembayaran;
     private Date tanggalJatuhTempo;
     private Date tanggalPembayaran;
+    private PaymentStatus statusPembayaran; 
 
-    // Enum untuk status pembayaran
-    public enum StatusPembayaran {
-        Belum_Dibayar,
-        Dibayar
-    }
-
-    // Constructor tanpa parameter
     public TaxOwnership() {
+        this.statusPembayaran = PaymentStatus.BELUM_DIBAYAR;
     }
 
     // Constructor dengan parameter
     public TaxOwnership(String noPlat, String namaPemilikLama, String namaPemilikBaru,
-            String alamatBaru, TaxType taxType, double jumlahPajak,
-            Date tanggalProses, StatusPembayaran statusPembayaran,
-            Date tanggalJatuhTempo, Date tanggalPembayaran) {
+                        String alamatBaru, TaxType taxType, double jumlahPajak,
+                        Date tanggalProses, Date tanggalJatuhTempo, Date tanggalPembayaran,
+                        PaymentStatus statusPembayaran) {
         
         this.noPlat = noPlat;
         this.namaPemilikLama = namaPemilikLama;
@@ -45,9 +39,9 @@ public class TaxOwnership extends Entity{
         this.taxType = taxType;
         this.jumlahPajak = jumlahPajak;
         this.tanggalProses = tanggalProses;
-        this.statusPembayaran = statusPembayaran;
         this.tanggalJatuhTempo = tanggalJatuhTempo;
         this.tanggalPembayaran = tanggalPembayaran;
+        this.statusPembayaran = statusPembayaran != null ? statusPembayaran : PaymentStatus.BELUM_DIBAYAR;
     }
 
     // Getters dan Setters
@@ -116,14 +110,6 @@ public class TaxOwnership extends Entity{
         this.tanggalProses = tanggalProses;
     }
 
-    public StatusPembayaran getStatusPembayaran() {
-        return statusPembayaran;
-    }
-
-    public void setStatusPembayaran(StatusPembayaran statusPembayaran) {
-        this.statusPembayaran = statusPembayaran;
-    }
-
     public Date getTanggalJatuhTempo() {
         return tanggalJatuhTempo;
     }
@@ -140,4 +126,11 @@ public class TaxOwnership extends Entity{
         this.tanggalPembayaran = tanggalPembayaran;
     }
 
+    public PaymentStatus getStatusPembayaran() {
+        return statusPembayaran;
+    }
+
+    public void setStatusPembayaran(PaymentStatus statusPembayaran) {
+        this.statusPembayaran = statusPembayaran;
+    }
 }

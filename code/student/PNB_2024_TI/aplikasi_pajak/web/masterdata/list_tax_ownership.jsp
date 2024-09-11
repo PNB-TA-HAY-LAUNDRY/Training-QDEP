@@ -1,9 +1,6 @@
-<%-- 
-    Document   : list_tax_ownership
-    Created on : Sep 10, 2024, 2:09:41 PM
-    Author     : ihsan
---%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.Vector"%>
+<%@page import="com.dimata.entity.pajak.PaymentStatus"%>
 <%@page import="java.util.Vector"%>
 <%@page import="com.dimata.entity.pajak.TaxType"%>
 <%@page import="com.dimata.entity.pajak.TaxOwnership"%>
@@ -97,8 +94,8 @@
                         <th>Jenis Pajak</th>
                         <th>Jumlah Pajak</th>
                         <th>Tanggal Proses</th>
-                        <th>Status Pembayaran</th>
                         <th>Tanggal Jatuh Tempo</th>
+                        <th>Status Pembayaran</th>
                         <th>Tanggal Pembayaran</th>
                     </tr>
                 </thead>
@@ -119,6 +116,7 @@
                                     }
                                 } catch (Exception e) {
                                     // Handle exception or set a default value if needed
+                                    taxTypeName = "Unknown";
                                 }
                     %>
                     <tr>
@@ -130,8 +128,8 @@
                         <td><%= taxTypeName %></td>
                         <td><%= taxOwnership.getJumlahPajak() %></td>
                         <td><%= taxOwnership.getTanggalProses() %></td>
-                        <td><%= taxOwnership.getStatusPembayaran() %></td>
-                        <td><%= taxOwnership.getTanggalJatuhTempo() %></td>
+                         <td><%= taxOwnership.getTanggalJatuhTempo() %></td>
+                        <td><%= taxOwnership.getStatusPembayaran().name() %></td>
                         <td><%= taxOwnership.getTanggalPembayaran() %></td>
                     </tr>
                     <%
