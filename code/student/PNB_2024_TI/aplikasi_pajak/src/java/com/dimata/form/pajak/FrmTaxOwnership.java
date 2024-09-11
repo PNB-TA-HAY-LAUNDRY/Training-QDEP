@@ -78,25 +78,21 @@ public class FrmTaxOwnership extends FRMHandler implements I_FRMInterface, I_FRM
        return fieldNames.length;
     }
 
-    // Method to return the form's name
     @Override
     public String getFormName() {
         return FRM_TAX_OWNERSHIP;
     }
 
-    // Method to return the names of the fields in the form
     @Override
     public String[] getFieldNames() {
         return fieldNames;
     }
 
-    // Method to return the types of the fields in the form
     @Override
     public int[] getFieldTypes() {
         return fieldTypes;
     }
     
-    // Method to return the current AssetType object
     public TaxOwnership getEntityObject() {
         return taxOwnership;
     }
