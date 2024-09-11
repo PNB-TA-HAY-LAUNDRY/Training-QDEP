@@ -1,86 +1,73 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.Vector"%>
-<%@page import="com.dimata.entity.pajak.PaymentStatus"%>
-<%@page import="java.util.Vector"%>
-<%@page import="com.dimata.entity.pajak.TaxType"%>
-<%@page import="com.dimata.entity.pajak.TaxOwnership"%>
-<%@page import="com.dimata.entity.pajak.PstTaxOwnership"%>
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Daftar Kepemilikan Pajak</title>
     <style>
-        /* Ensuring styles are consistent with the index design */
-        html, body {
-            height: 100%;
-            margin: 0;
+        /* Scoped styles to prevent interference with the sidebar and other parts of index.jsp */
+        .tax-ownership-page {
             font-family: 'Roboto', sans-serif;
             background-color: #f4f7f9;
+            padding: 20px;
         }
-        .container {
-            display: flex;
-            height: 100vh;
-        }
-        .main-content-wrapper {
-            flex-grow: 1;
-            display: flex;
-            overflow: hidden;
-        }
-        .main-content {
-            flex: 1;
+
+        .tax-ownership-page .main-content {
             background-color: #fff;
-            padding: 30px;
-            margin: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             overflow: auto;
-            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-            opacity: 1;
-            transform: translateX(0);
+            margin: 20px; /* Margin to separate from other content if needed */
         }
-        .main-content h1 {
+
+        .tax-ownership-page .main-content h1 {
             font-size: 24px;
             margin-bottom: 20px;
             color: #333;
-            font-weight: 400;
         }
-        table {
+
+        .tax-ownership-page table {
             width: 100%;
             border-collapse: collapse;
         }
-        table, th, td {
+
+        .tax-ownership-page table, .tax-ownership-page th, .tax-ownership-page td {
             border: 1px solid #ddd;
         }
-        th, td {
+
+        .tax-ownership-page th, .tax-ownership-page td {
             padding: 12px;
             text-align: left;
+            font-size: 14px;
         }
-        th {
+
+        .tax-ownership-page th {
             background-color: #3a5ba0;
             color: white;
         }
-        tr:nth-child(even) {
+
+        .tax-ownership-page tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        tr:hover {
+
+        .tax-ownership-page tr:hover {
             background-color: #f1f1f1;
         }
-        .no-data {
+
+        .tax-ownership-page .no-data {
             text-align: center;
             color: #666;
             padding: 20px;
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-
-    <div class="main-content-wrapper">
+    <div class="tax-ownership-page">
         <div class="main-content">
             <h1>Daftar Kepemilikan Pajak</h1>
             <table>
@@ -101,21 +88,18 @@
                 </thead>
                 <tbody>
                     <%
-                        // Mendapatkan data dari database menggunakan PstTaxOwnership
                         Vector taxOwnershipList = PstTaxOwnership.listAll(0, 0, null, "transfer_tax_id ASC");
 
                         if (taxOwnershipList != null && taxOwnershipList.size() > 0) {
-                            // Iterasi melalui daftar kepemilikan pajak
                             for (int i = 0; i < taxOwnershipList.size(); i++) {
                                 TaxOwnership taxOwnership = (TaxOwnership) taxOwnershipList.get(i);
-                                String taxTypeName = ""; // Default value
+                                String taxTypeName = "";
                                 try {
                                     TaxType taxType = taxOwnership.getTaxType();
                                     if (taxType != null) {
                                         taxTypeName = taxType.getNamaPajak();
                                     }
                                 } catch (Exception e) {
-                                    // Handle exception or set a default value if needed
                                     taxTypeName = "Unknown";
                                 }
                     %>
@@ -128,9 +112,9 @@
                         <td><%= taxTypeName %></td>
                         <td><%= taxOwnership.getJumlahPajak() %></td>
                         <td><%= taxOwnership.getTanggalProses() %></td>
-                         <td><%= taxOwnership.getTanggalJatuhTempo() %></td>
-                        <td><%= taxOwnership.getStatusPembayaran().name() %></td>
-                        <td><%= taxOwnership.getTanggalPembayaran() %></td>
+                        <td><%= taxOwnership.getTanggalJatuhTempo() %></td>
+                        <td><%= taxOwnership.getStatusPembayaran() %></td>
+                        <td><%= taxOwnership.getTanggalPembayaran() != null ? taxOwnership.getTanggalPembayaran() : "" %></td>
                     </tr>
                     <%
                             }
@@ -146,6 +130,5 @@
             </table>
         </div>
     </div>
-
 </body>
 </html>

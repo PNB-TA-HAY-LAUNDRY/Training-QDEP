@@ -20,10 +20,10 @@ public class TaxOwnership extends Entity {
     private Date tanggalProses;
     private Date tanggalJatuhTempo;
     private Date tanggalPembayaran;
-    private PaymentStatus statusPembayaran; 
+    private PaymentStatus status;
 
     public TaxOwnership() {
-        this.statusPembayaran = PaymentStatus.BELUM_DIBAYAR;
+        this.status = PaymentStatus.BELUM_DIBAYAR;
     }
 
     public TaxOwnership(String noPlat, String namaPemilikLama, String namaPemilikBaru,
@@ -40,7 +40,7 @@ public class TaxOwnership extends Entity {
         this.tanggalProses = tanggalProses;
         this.tanggalJatuhTempo = tanggalJatuhTempo;
         this.tanggalPembayaran = tanggalPembayaran;
-        this.statusPembayaran = statusPembayaran != null ? statusPembayaran : PaymentStatus.BELUM_DIBAYAR;
+        this.status = statusPembayaran != null ? statusPembayaran : PaymentStatus.BELUM_DIBAYAR;
     }
 
     // Getters dan Setters
@@ -126,10 +126,10 @@ public class TaxOwnership extends Entity {
     }
 
     public PaymentStatus getStatusPembayaran() {
-        return statusPembayaran;
+        return status;
     }
 
-    public void setStatusPembayaran(PaymentStatus statusPembayaran) {
-        this.statusPembayaran = statusPembayaran;
+    public void setStatusPembayaran(PaymentStatus status) {
+        this.status = status;
     }
 }
