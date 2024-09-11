@@ -67,12 +67,10 @@ public class PstTaxOwnership extends DBHandler implements I_DBInterface, I_DBTyp
     public PstTaxOwnership(){
     }
     
-    // Constructor to instantiate with an integer (could be used for querying)
     public PstTaxOwnership(int i) throws DBException {
         super(new PstTaxOwnership());
     }
 
-    // Constructor that initializes the entity with a string OID (Object ID)
     public PstTaxOwnership(String sOid) throws DBException {
         super(new PstTaxOwnership(0));
         if (!locate(sOid)) {
@@ -82,7 +80,6 @@ public class PstTaxOwnership extends DBHandler implements I_DBInterface, I_DBTyp
         }
     }
 
-    // Constructor that initializes the entity with a long OID
     public PstTaxOwnership(long lOid) throws DBException {
         super(new PstTaxOwnership(0));
         String sOid = "0";
@@ -166,7 +163,7 @@ public class PstTaxOwnership extends DBHandler implements I_DBInterface, I_DBTyp
             pstTaxOwnership.setString(FLD_NEW_ADDRESS, taxOwnership.getAlamatBaru());
             pstTaxOwnership.setLong(FLD_TAX_TYPE_ID, taxOwnership.getTaxType().getOID());
             pstTaxOwnership.setDouble(FLD_TOTAL_TAX, taxOwnership.getJumlahPajak());
-            pstTaxOwnership.setString(FLD_PAY_STATUS, taxOwnership.getStatusPembayaran().getStatus()); // Set status pembayaran
+            pstTaxOwnership.setString(FLD_PAY_STATUS, taxOwnership.getStatusPembayaran().getStatus()); 
             pstTaxOwnership.setDate(FLD_PROCESS_DATE, taxOwnership.getTanggalProses());
             pstTaxOwnership.setDate(FLD_DUE_DATE, taxOwnership.getTanggalJatuhTempo());
             pstTaxOwnership.setDate(FLD_PAY_DATE, taxOwnership.getTanggalPembayaran());
@@ -264,7 +261,6 @@ public class PstTaxOwnership extends DBHandler implements I_DBInterface, I_DBTyp
             sql += " ORDER BY " + order;
         }
 
-        // Handle limit and offset based on the DB server type
         switch (DBHandler.DBSVR_TYPE) {
             case DBHandler.DBSVR_MYSQL:
             case DBHandler.DBSVR_POSTGRESQL:
@@ -276,31 +272,27 @@ public class PstTaxOwnership extends DBHandler implements I_DBInterface, I_DBTyp
             case DBHandler.DBSVR_SYBASE:
             case DBHandler.DBSVR_ORACLE:
             case DBHandler.DBSVR_MSSQL:
-                // Implement if needed for other DBs
                 break;
 
             default:
                 break;
         }
 
-        // Execute the query
         dbrs = DBHandler.execQueryResult(sql);
         ResultSet rs = dbrs.getResultSet();
         
-        // Extract data from the result set
         while (rs.next()) {
             TaxOwnership taxOwnership = new TaxOwnership();
             resultToObject(rs, taxOwnership);
             lists.add(taxOwnership);
         }
         
-        rs.close(); // Ensure the ResultSet is closed after processing
+        rs.close(); 
         return lists;
 
     } catch (Exception e) {
         System.out.println("Error: " + e);
     } finally {
-        DBResultSet.close(dbrs); // Ensure the DBResultSet is closed in finally block
     }
     return new Vector();
 }
@@ -338,7 +330,7 @@ public class PstTaxOwnership extends DBHandler implements I_DBInterface, I_DBTyp
         try {
             String sql = "";
 
-            if (type == 1) {// check asset name
+            if (type == 1) {
                 sql = "SELECT * FROM " + TBL_TAX_OWNER + " WHERE "
                         + PstTaxOwnership.fieldNames[PstTaxOwnership.FLD_NO_PLAT] + " = '" + no + "'";
             }

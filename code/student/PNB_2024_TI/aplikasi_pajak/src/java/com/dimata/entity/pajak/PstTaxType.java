@@ -34,16 +34,13 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
         TYPE_FLOAT
     };
 
-    // Default constructor
     public PstTaxType(){
     }
     
-    // Constructor to instantiate with an integer (could be used for querying)
     public PstTaxType(int i) throws DBException {
         super(new PstTaxType());
     }
 
-    // Constructor that initializes the entity with a string OID (Object ID)
     public PstTaxType(String sOid) throws DBException {
         super(new PstTaxType(0));
         if (!locate(sOid)) {
@@ -53,7 +50,6 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
         }
     }
 
-    // Constructor that initializes the entity with a long OID
     public PstTaxType(long lOid) throws DBException {
         super(new PstTaxType(0));
         String sOid = "0";
@@ -113,7 +109,7 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
         return taxType.getOID();
     }
 
-    // Update an AssetList entity in the database
+    
     @Override
     public long updateExc(Entity ent) throws Exception {
         return updateExc((TaxType) ent);
@@ -136,7 +132,7 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
         return 0;
     }
 
-     // Deletes an AssetList entity from the database
+    
     @Override
     public long deleteExc(Entity ent) throws Exception {
        if (ent == null) {
@@ -157,7 +153,7 @@ public class PstTaxType extends DBHandler implements I_DBInterface, I_DBType, I_
         return oid;
     }
 
-    // Fetches an AssetList entity from the database using its OID
+    
     @Override
     public long fetchExc(Entity ent) throws Exception {
         TaxType taxType = fetchExc(ent.getOID());
@@ -203,7 +199,6 @@ public static Vector list(int limitStart, int recordToGet, String whereClause, S
             sql += " ORDER BY " + order;
         }
 
-        // Handle limit and offset based on the DB server type
         switch (DBHandler.DBSVR_TYPE) {
             case DBHandler.DBSVR_MYSQL:
             case DBHandler.DBSVR_POSTGRESQL:
@@ -215,31 +210,28 @@ public static Vector list(int limitStart, int recordToGet, String whereClause, S
             case DBHandler.DBSVR_SYBASE:
             case DBHandler.DBSVR_ORACLE:
             case DBHandler.DBSVR_MSSQL:
-                // Implement if needed for other DBs
                 break;
 
             default:
                 break;
         }
 
-        // Execute the query
         dbrs = DBHandler.execQueryResult(sql);
         ResultSet rs = dbrs.getResultSet();
         
-        // Extract data from the result set
         while (rs.next()) {
             TaxType taxType = new TaxType();
             resultToObject(rs, taxType);
             lists.add(taxType);
         }
         
-        rs.close(); // Ensure the ResultSet is closed after processing
+        rs.close();
         return lists;
 
     } catch (Exception e) {
         System.out.println("Error: " + e);
     } finally {
-        DBResultSet.close(dbrs); // Ensure the DBResultSet is closed in finally block
+        DBResultSet.close(dbrs); 
     }
     return new Vector();
 }
@@ -256,14 +248,13 @@ public static Vector list(int limitStart, int recordToGet, String whereClause, S
         }
     }
 
-    // Checks if an asset condition exists in the database based on name and type
     public static boolean checkTaxType(String name, int type) {
         DBResultSet dbrs = null;
         boolean result = false;
         try {
             String sql = "";
 
-            if (type == 1) {// check asset name
+            if (type == 1) {
                 sql = "SELECT * FROM " + TBL_TAX_TYPE + " WHERE "
                         + PstTaxType.fieldNames[PstTaxType.FLD_NAME_TAX] + " = '" + name + "'";
             }
