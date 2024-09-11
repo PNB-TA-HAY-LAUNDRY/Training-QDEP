@@ -120,14 +120,14 @@
 
 
                 %>
-               <%  // Cek jika listAssets kosong atau null
+               <%  
                 if (listTypes == null || listTypes.isEmpty()) {
                %>  
             <tr>
                 <td colspan="11" class="no-data">Tidak ada data kepemilikan pajak tersedia.</td>
             </tr>
                <%  } else { 
-               int index = 1; // Initialize row number
+               int index = 1; 
                for (TaxOwnership taxOwnership : listTypes) {
                %>
                <% 
