@@ -26,7 +26,6 @@ public class TaxOwnership extends Entity {
         this.statusPembayaran = PaymentStatus.BELUM_DIBAYAR;
     }
 
-    // Constructor dengan parameter
     public TaxOwnership(String noPlat, String namaPemilikLama, String namaPemilikBaru,
                         String alamatBaru, TaxType taxType, double jumlahPajak,
                         Date tanggalProses, Date tanggalJatuhTempo, Date tanggalPembayaran,
