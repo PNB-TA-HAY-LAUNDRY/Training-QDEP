@@ -3,7 +3,6 @@
     Created on : Sep 11, 2024, 11:06:13 PM
     Author     : ihsan
 --%>
-
 <%@page import="com.dimata.util.Command"%>
 <%@page import="com.dimata.form.pajak.CtrlTaxOwnership"%>
 <%@page import="com.dimata.qdep.form.FRMQueryString"%>
@@ -11,32 +10,6 @@
 <%@page import="com.dimata.entity.pajak.TaxOwnership"%>
 <%@page import="com.dimata.entity.pajak.TaxType"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
-<%
-    // This defines the current page as 'asset_list' for use within the page
-    String currentPage = "list_tax_ownership"; // Sesuaikan nama halaman di sini
-%>
-<%
-    // Declare a vector to hold asset types, asset conditions, asset lists
-    Vector<TaxOwnership> listTypes = new Vector();
-
-    // Retrieve the current command sent via the request, e.g., ADD, DELETE, etc.
-    int iCommand = FRMQueryString.requestCommand(request);
-
-    // Initialize controller for managing asset list 
-    CtrlTaxOwnership ctrlTaxOwnership = new CtrlTaxOwnership(request);
-
-    // Fetch list of asset types from the database
-    try {
-        ctrlTaxOwnership.action(Command.LIST, 0);
-
-        listTypes = (Vector<TaxOwnership>) request.getAttribute("taxOwnerships");
-    } catch (Exception e) {
-        log("Error: " + e);  // Use log() instead of System.out.println()
-    }
-
-
-%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -127,6 +100,26 @@
                 </tr>
             </thead>
             <tbody>
+                <%
+                    String currentPage = "list_tax_ownership";
+                %>
+                <%
+                    Vector<TaxOwnership> listTypes = new Vector();
+
+                    int iCommand = FRMQueryString.requestCommand(request);
+
+                    CtrlTaxOwnership ctrlTaxOwnership = new CtrlTaxOwnership(request);
+
+                    try {
+                        ctrlTaxOwnership.action(Command.LIST, 0);
+
+                        listTypes = (Vector<TaxOwnership>) request.getAttribute("taxOwnerships");
+                    } catch (Exception e) {
+                        log("Error: " + e); 
+                    }
+
+
+                %>
                <%  // Cek jika listAssets kosong atau null
                 if (listTypes == null || listTypes.isEmpty()) {
                %>  
@@ -149,16 +142,16 @@
                             }
                %>
             <tr>
-                <td><%= index++ %></td> <!-- Row number -->
-                <td><%= taxOwnership.getNoPlat() %></td> <!-- No Plat -->
-                <td><%= taxOwnership.getNamaPemilikLama() %></td> <!-- Nama Pemilik Lama -->
-                <td><%= taxOwnership.getNamaPemilikBaru() %></td> <!-- Nama Pemilik Baru -->
-                <td><%= taxOwnership.getAlamatBaru() %></td> <!-- Alamat Baru -->
-                <td><%= taxTypeName %></td> <!-- Jenis Pajak -->
-                <td><%= taxOwnership.getJumlahPajak() %></td> <!-- Jumlah Pajak -->
-                <td><%= taxOwnership.getTanggalProses() %></td> <!-- Tanggal Proses -->
-                <td><%= taxOwnership.getTanggalJatuhTempo() %></td> <!-- Tanggal Jatuh Tempo -->
-                <td><%= taxOwnership.getStatusPembayaran() %></td> <!-- Status Pembayaran -->
+                <td><%= index++ %></td> 
+                <td><%= taxOwnership.getNoPlat() %></td> 
+                <td><%= taxOwnership.getNamaPemilikLama() %></td>
+                <td><%= taxOwnership.getNamaPemilikBaru() %></td> 
+                <td><%= taxOwnership.getAlamatBaru() %></td> 
+                <td><%= taxTypeName %></td>
+                <td><%= taxOwnership.getJumlahPajak() %></td> 
+                <td><%= taxOwnership.getTanggalProses() %></td> 
+                <td><%= taxOwnership.getTanggalJatuhTempo() %></td> 
+                <td><%= taxOwnership.getStatusPembayaran() %></td> 
                 <td><%= taxOwnership.getTanggalPembayaran() != null ? (taxOwnership.getTanggalPembayaran()) : "" %></td>
             </tr>
 <%      }
