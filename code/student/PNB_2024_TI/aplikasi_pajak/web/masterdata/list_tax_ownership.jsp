@@ -128,7 +128,7 @@
                         <td><%= taxTypeName %></td>
                         <td><%= taxOwnership.getJumlahPajak() %></td>
                         <td><%= taxOwnership.getTanggalProses() %></td>
-                         <td><%= taxOwnership.getTanggalJatuhTempo() %></td>
+                        <td><%= taxOwnership.getTanggalJatuhTempo() %></td>
                         <td><%= taxOwnership.getStatusPembayaran().name() %></td>
                         <td><%= taxOwnership.getTanggalPembayaran() %></td>
                     </tr>

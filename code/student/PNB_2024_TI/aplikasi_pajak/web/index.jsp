@@ -265,7 +265,7 @@
             </div>
             <h2>Master Data</h2>
             <div class="submenu">
-                <a href="#" data-page="pajak_kendaraan.jsp">Vehicle Tax</a>
+                <a href="#" data-page="masterdata\list_tax_vehicle.jsp">Vehicle Tax</a>
                 <a href="#" data-page="masterdata\list_tax_ownership.jsp">Vehicle Transfer Tax</a>
                 <a href="#" data-page="pajak_bahan_bakar.jsp">Fuel Tax</a>
                 <a href="#" data-page="pajak_air.jsp">Water Tax</a>

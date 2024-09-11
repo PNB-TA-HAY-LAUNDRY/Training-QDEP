@@ -29,7 +29,6 @@ public interface I_DBType
     public static final int TYPE_LONG       = 7;
     public static final int TYPE_LONG_0_IS_NULL = 8;
 
-    
     public static final int TYPE_ID         = 256;
 
     public static final int TYPE_PK         = 512;
