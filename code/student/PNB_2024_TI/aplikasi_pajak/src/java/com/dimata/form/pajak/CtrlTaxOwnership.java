@@ -8,7 +8,9 @@ import com.dimata.entity.pajak.PstTaxOwnership;
 import com.dimata.entity.pajak.TaxOwnership;
 import com.dimata.qdep.form.Control;
 import com.dimata.qdep.system.I_DBExceptionInfo;
+import com.dimata.util.Command;
 import com.dimata.util.lang.I_Language;
+import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -98,5 +100,22 @@ public class CtrlTaxOwnership extends Control implements I_Language{
     // Getter for the start index
     public int getStart() {
         return start;
+    }
+    
+    public int action (int cmd, long oidTax){
+        msgString = "";
+        int excCode = I_DBExceptionInfo.NO_EXCEPTION;
+        int rsCode = RSLT_OK;
+        switch (cmd){
+            case Command.LIST:
+                try {
+                    Vector <TaxOwnership> taxOwnerships = PstTaxOwnership.listAll(0, 0, "", "");
+                    
+                    request.setAttribute("taxOwnerships", taxOwnerships);
+                } catch (Exception e){
+                    System.out.println("Exception " + e);
+                } break;
+        }
+        return excCode;
     }
 }

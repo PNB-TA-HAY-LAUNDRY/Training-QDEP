@@ -1,10 +1,42 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.Vector"%>
-<%@page import="com.dimata.entity.pajak.PaymentStatus"%>
-<%@page import="com.dimata.entity.pajak.TaxType"%>
-<%@page import="com.dimata.entity.pajak.TaxOwnership"%>
-<%@page import="com.dimata.entity.pajak.PstTaxOwnership"%>
+<%-- 
+    Document   : list_tax_ownership
+    Created on : Sep 11, 2024, 11:06:13 PM
+    Author     : ihsan
+--%>
 
+<%@page import="com.dimata.util.Command"%>
+<%@page import="com.dimata.form.pajak.CtrlTaxOwnership"%>
+<%@page import="com.dimata.qdep.form.FRMQueryString"%>
+<%@page import="java.util.Vector"%>
+<%@page import="com.dimata.entity.pajak.TaxOwnership"%>
+<%@page import="com.dimata.entity.pajak.TaxType"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<%
+    // This defines the current page as 'asset_list' for use within the page
+    String currentPage = "list_tax_ownership"; // Sesuaikan nama halaman di sini
+%>
+<%
+    // Declare a vector to hold asset types, asset conditions, asset lists
+    Vector<TaxOwnership> listTypes = new Vector();
+
+    // Retrieve the current command sent via the request, e.g., ADD, DELETE, etc.
+    int iCommand = FRMQueryString.requestCommand(request);
+
+    // Initialize controller for managing asset list 
+    CtrlTaxOwnership ctrlTaxOwnership = new CtrlTaxOwnership(request);
+
+    // Fetch list of asset types from the database
+    try {
+        ctrlTaxOwnership.action(Command.LIST, 0);
+
+        listTypes = (Vector<TaxOwnership>) request.getAttribute("taxOwnerships");
+    } catch (Exception e) {
+        log("Error: " + e);  // Use log() instead of System.out.println()
+    }
+
+
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -75,7 +107,7 @@
         }
     </style>
 </head>
-<body>
+    <body>
     <div class="main-content">
         <h1>Daftar Kepemilikan Pajak</h1>
         <table>
@@ -95,13 +127,18 @@
                 </tr>
             </thead>
             <tbody>
-                <%
-                    Vector taxOwnershipList = PstTaxOwnership.listAll(0, 0, null, "transfer_tax_id ASC");
-
-                    if (taxOwnershipList != null && taxOwnershipList.size() > 0) {
-                        for (int i = 0; i < taxOwnershipList.size(); i++) {
-                            TaxOwnership taxOwnership = (TaxOwnership) taxOwnershipList.get(i);
-                            String taxTypeName = "";
+               <%  // Cek jika listAssets kosong atau null
+                if (listTypes == null || listTypes.isEmpty()) {
+               %>  
+            <tr>
+                <td colspan="11" class="no-data">Tidak ada data kepemilikan pajak tersedia.</td>
+            </tr>
+               <%  } else { 
+               int index = 1; // Initialize row number
+               for (TaxOwnership taxOwnership : listTypes) {
+               %>
+               <% 
+                String taxTypeName = "";
                             try {
                                 TaxType taxType = taxOwnership.getTaxType();
                                 if (taxType != null) {
@@ -110,32 +147,26 @@
                             } catch (Exception e) {
                                 taxTypeName = "Unknown";
                             }
-                %>
-                <tr>
-                    <td><%= taxOwnership.getTransferTaxId() %></td>
-                    <td><%= taxOwnership.getNoPlat() %></td>
-                    <td><%= taxOwnership.getNamaPemilikLama() %></td>
-                    <td><%= taxOwnership.getNamaPemilikBaru() %></td>
-                    <td><%= taxOwnership.getAlamatBaru() %></td>
-                    <td><%= taxTypeName %></td>
-                    <td><%= taxOwnership.getJumlahPajak() %></td>
-                    <td><%= taxOwnership.getTanggalProses() %></td>
-                    <td><%= taxOwnership.getTanggalJatuhTempo() %></td>
-                    <td><%= taxOwnership.getStatusPembayaran() %></td>
-                    <td><%= taxOwnership.getTanggalPembayaran() != null ? (taxOwnership.getTanggalPembayaran()) : "" %></td>
-                </tr>
-                <%
-                        }
-                    } else {
-                %>
-                <tr>
-                    <td colspan="11" class="no-data">Tidak ada data ditemukan</td>
-                </tr>
-                <%
-                    }
-                %>
+               %>
+            <tr>
+                <td><%= index++ %></td> <!-- Row number -->
+                <td><%= taxOwnership.getNoPlat() %></td> <!-- No Plat -->
+                <td><%= taxOwnership.getNamaPemilikLama() %></td> <!-- Nama Pemilik Lama -->
+                <td><%= taxOwnership.getNamaPemilikBaru() %></td> <!-- Nama Pemilik Baru -->
+                <td><%= taxOwnership.getAlamatBaru() %></td> <!-- Alamat Baru -->
+                <td><%= taxTypeName %></td> <!-- Jenis Pajak -->
+                <td><%= taxOwnership.getJumlahPajak() %></td> <!-- Jumlah Pajak -->
+                <td><%= taxOwnership.getTanggalProses() %></td> <!-- Tanggal Proses -->
+                <td><%= taxOwnership.getTanggalJatuhTempo() %></td> <!-- Tanggal Jatuh Tempo -->
+                <td><%= taxOwnership.getStatusPembayaran() %></td> <!-- Status Pembayaran -->
+                <td><%= taxOwnership.getTanggalPembayaran() != null ? (taxOwnership.getTanggalPembayaran()) : "" %></td>
+            </tr>
+<%      }
+    } 
+%>
             </tbody>
         </table>
     </div>
 </body>
 </html>
+
