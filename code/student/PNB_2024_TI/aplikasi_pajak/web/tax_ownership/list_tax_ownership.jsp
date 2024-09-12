@@ -1,3 +1,4 @@
+<%@page import="com.dimata.qdep.system.I_DBExceptionInfo"%>
 <%@page import="com.dimata.util.Command"%>
 <%@page import="com.dimata.form.pajak.CtrlTaxOwnership"%>
 <%@page import="com.dimata.qdep.form.FRMQueryString"%>
@@ -5,6 +6,46 @@
 <%@page import="com.dimata.entity.pajak.TaxOwnership"%>
 <%@page import="com.dimata.entity.pajak.TaxType"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+                    String currentPage = "list_tax_ownership";
+                    
+                    Vector<TaxOwnership> listTypes = new Vector();
+                    
+                    int iCommand = FRMQueryString.requestCommand(request);
+                    
+                    long idDeleteTax = FRMQueryString.requestLong(request, "idDeleteTax");
+                    
+                    CtrlTaxOwnership ctrlTaxOwnership = new CtrlTaxOwnership(request);
+                    
+                    boolean success = false;
+                    
+                    // Handle DELETE command
+                    if (iCommand == Command.DELETE) {
+                        if (idDeleteTax != 0) {
+                            try {
+                                // Attempt to delete asset list by ID
+                                int action = ctrlTaxOwnership.action(iCommand, idDeleteTax);
+                                if (action == I_DBExceptionInfo.NO_EXCEPTION) {
+                                    success = true;
+                                }
+                            } catch (Exception e) {
+                                out.println("Error delete data: " + e);
+                            }
+                        }
+                    }
+
+                    
+                    if (iCommand == Command.ADD) {
+                        response.sendRedirect("frm_tax_ownership.jsp");
+                    }
+
+                    try {
+                        ctrlTaxOwnership.action(Command.LIST, 0);
+                        listTypes = (Vector<TaxOwnership>) request.getAttribute("taxOwnerships");
+                    } catch (Exception e) {
+                        log("Error: " + e); 
+                    }
+                %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -133,31 +174,9 @@
                     <th>Tanggal Jatuh Tempo</th>
                     <th>Status Pembayaran</th>
                     <th>Tanggal Pembayaran</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <%
-                    String currentPage = "list_tax_ownership";
-                    
-                    Vector<TaxOwnership> listTypes = new Vector();
-                    
-                    int iCommand = FRMQueryString.requestCommand(request);
-                    
-                    CtrlTaxOwnership ctrlTaxOwnership = new CtrlTaxOwnership(request);
-                    
-                    // Handle ADD command by redirecting to the form page for adding a new asset list
-                    if (iCommand == Command.ADD) {
-                        response.sendRedirect("form_tax_ownership.jsp");
-                    }
-
-                    try {
-                        ctrlTaxOwnership.action(Command.LIST, 0);
-                        listTypes = (Vector<TaxOwnership>) request.getAttribute("taxOwnerships");
-                    } catch (Exception e) {
-                        log("Error: " + e); 
-                    }
-                %>
                <% if (listTypes == null || listTypes.isEmpty()) { %>  
                 <tr>
                     <td colspan="12" class="no-data">Tidak ada data kepemilikan pajak tersedia.</td>
@@ -187,17 +206,6 @@
                     <td><%= taxOwnership.getTanggalJatuhTempo() %></td> 
                     <td><%= taxOwnership.getStatusPembayaran() %></td> 
                     <td><%= taxOwnership.getTanggalPembayaran() != null ? taxOwnership.getTanggalPembayaran() : "" %></td>
-
-                    <!-- Action icons for update and delete -->
-                    <td class="action-icons">
-                        <a href="form_update_tax_ownership.jsp?id="Edit">
-                            &#x270E; <!-- Edit icon (pencil) -->
-                        </a>
-                        <a href="process_delete_tax_ownership.jsp?id=" title="Delete" 
-                           onclick="return confirm('Yakin ingin menghapus data ini?');">
-                            &#x1F5D1; <!-- Delete icon (trash can) -->
-                        </a>
-                    </td>
                 </tr>
                <% } } %>
             </tbody>

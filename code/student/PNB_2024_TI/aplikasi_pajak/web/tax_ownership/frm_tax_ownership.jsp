@@ -3,7 +3,57 @@
     Created on : Sep 12, 2024, 11:34:48?AM
     Author     : ihsan
 --%>
+<%@page import="java.util.logging.Logger"%>
+<%@page import="com.dimata.qdep.system.I_DBExceptionInfo"%>
+<%@page import="com.dimata.util.Command"%>
+<%@page import="java.util.Vector"%>
+<%@page import="com.dimata.entity.pajak.TaxOwnership"%>
+<%@page import="com.dimata.form.pajak.FrmTaxOwnership"%>
+<%@page import="com.dimata.form.pajak.CtrlTaxOwnership"%>
+<%@page import="com.dimata.qdep.form.FRMQueryString"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<% 
+    int iCommand = FRMQueryString.requestCommand(request);
+    long taxOID = FRMQueryString.requestLong(request, "tax_oid");
+    boolean success = false;
+    CtrlTaxOwnership ctrlTaxOwnership = new CtrlTaxOwnership(request);
+    FrmTaxOwnership frmTaxOwnership = new FrmTaxOwnership();
+    String titlePage = "";
+    Logger logger = Logger.getLogger("TaxOwnershipLogger");
+    
+    Vector<TaxOwnership> listOwnership = new Vector();
+    TaxOwnership taxOwnership = new TaxOwnership();
+    
+    try {
+        if (taxOID != 0) {
+            titlePage = "Edit TaxOwnership";
+            
+            int action = ctrlTaxOwnership.action(iCommand, taxOID);
+            logger.info("Received iCommand: " + iCommand);
 
+            if (iCommand == Command.EDIT) {
+                taxOwnership = (TaxOwnership) request.getAttribute("taxOwnership");
+                logger.info("TaxOwnership: " + taxOwnership);
+            }
+
+            if (action == I_DBExceptionInfo.NO_EXCEPTION) {
+                success = true;
+            }
+            
+        } else {
+            titlePage = "Add TaxOwnership";
+            
+            int action = ctrlTaxOwnership.action(iCommand, taxOID);
+            if (action == I_DBExceptionInfo.NO_EXCEPTION) {
+                success = true;
+            }
+        }
+    } catch (Exception e) {
+        logger.severe("Error exception: " + e.getMessage());
+        e.printStackTrace();
+    }
+
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -77,9 +127,11 @@
     </style>
 </head>
 <body>
-    <div class="main-content">
+    <div id="wrapper">
         <h1>Form Kepemilikan Pajak</h1>
-        <form action="process_tax_ownership" method="post">
+        <div class="container">
+        <!-- Form for adding and changing asset lists and handling command -->
+        <form name="form" method="post" role="form">
             <label for="no_plat">No Plat:</label>
             <input type="text" id="no_plat" name="no_plat" required>
 
@@ -114,9 +166,10 @@
 
             <label for="tanggal_pembayaran">Tanggal Pembayaran (opsional):</label>
             <input type="date" id="tanggal_pembayaran" name="tanggal_pembayaran">
-
+            
             <button type="submit">Simpan</button>
         </form>
     </div>
 </body>
+
 </html>

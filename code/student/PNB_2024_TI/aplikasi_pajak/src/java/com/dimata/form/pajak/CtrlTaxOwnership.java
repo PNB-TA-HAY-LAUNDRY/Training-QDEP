@@ -186,20 +186,25 @@ public class CtrlTaxOwnership extends Control implements I_Language{
                     
             // function untuk menghapus data dari tabel            
             case Command.DELETE:
-                if (oidTax != 0){
+                if (oidTax != 0) {
                     try {
-                        long oid = pstTaxOwnership.deleteExc(taxOwnership);
-                    } catch (DBException dbexception){
+                        long oid = pstTaxOwnership.deleteExc(oidTax);
+                        if (oid != 0) {
+                            msgString = "Data berhasil dihapus.";
+                        } else {
+                            msgString = "Data gagal dihapus.";
+                        }
+                    } catch (DBException dbexception) {
                         excCode = dbexception.getErrorCode();
                         msgString = getSystemMessage(excCode);
                         return getControlMsgId(excCode);
-                    } catch (Exception exception){
+                    } catch (Exception exception) {
                         msgString = getSystemMessage(I_DBExceptionInfo.UNKNOWN);
                         return getControlMsgId(I_DBExceptionInfo.UNKNOWN);
                     }
                 } break;
-                    
                 
+                    
                 
                 
             // function untuk mengedit data 
