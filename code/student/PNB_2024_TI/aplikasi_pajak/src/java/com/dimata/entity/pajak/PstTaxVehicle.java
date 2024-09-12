@@ -59,8 +59,8 @@ public class PstTaxVehicle extends DBHandler implements I_DBInterface, I_DBType,
         TYPE_INT, // tahun_pembuatan
         TYPE_LONG, // tax_type_id
         TYPE_FLOAT, // jumlah_pajak
-        TYPE_DATE, // tanggal_jatuh_tempo
         TYPE_STRING,// periode_pajak
+        TYPE_DATE, // tanggal_jatuh_tempo
         TYPE_STRING, // status_pembayaran                    
         TYPE_DATE // tanggal_pembayaran
     };
