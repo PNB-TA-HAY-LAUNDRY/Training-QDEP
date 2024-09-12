@@ -6,7 +6,9 @@ package com.dimata.form.pajak;
 
 import com.dimata.entity.pajak.PstTaxOwnership;
 import com.dimata.entity.pajak.TaxOwnership;
+import com.dimata.qdep.db.DBException;
 import com.dimata.qdep.form.Control;
+import com.dimata.qdep.form.FRMMessage;
 import com.dimata.qdep.system.I_DBExceptionInfo;
 import com.dimata.util.Command;
 import com.dimata.util.lang.I_Language;
@@ -107,6 +109,13 @@ public class CtrlTaxOwnership extends Control implements I_Language{
         int excCode = I_DBExceptionInfo.NO_EXCEPTION;
         int rsCode = RSLT_OK;
         switch (cmd){
+            case Command.ADD:
+                // tidak ada codingan cuman pakai link ke Form 
+                break;
+          
+                
+                
+            // function untuk pemanggilan data ke tabel 
             case Command.LIST:
                 try {
                     Vector <TaxOwnership> taxOwnerships = PstTaxOwnership.listAll(0, 0, "", "");
@@ -115,6 +124,112 @@ public class CtrlTaxOwnership extends Control implements I_Language{
                 } catch (Exception e){
                     System.out.println("Exception " + e);
                 } break;
+             
+                
+                
+                
+            // function untuk menyimpan data dari form ke dalam tabel    
+            case Command.SAVE:
+                    String taxOldPlat = "";
+                    if (oidTax != 0){
+                        try {
+                            taxOwnership = PstTaxOwnership.fetchExc(oidTax);
+                            prevTaxOwnership = PstTaxOwnership.fetchExc(oidTax);
+                            taxOldPlat = taxOwnership.getNoPlat();
+                        } catch (Exception exc){
+                        
+                        }
+                    }
+                    
+                    frmTaxOwnership.requestEntityObject(taxOwnership);
+                    if (frmTaxOwnership.errorSize() > 0){
+                        msgString = FRMMessage.getMsg(FRMMessage.MSG_INCOMPLATE);
+                        return RSLT_FORM_INCOMPLETE;
+                    }
+                    
+                    if (taxOwnership.getOID() == 0){
+                        try {
+                            boolean checkedPlat = pstTaxOwnership.checkTaxOwnership(taxOwnership.getNoPlat(),1 );
+                            
+                            if (checkedPlat == false){
+                                long oid = pstTaxOwnership.insertExc(this.taxOwnership);
+                            } else {
+                                msgString = getSystemMessage(I_DBExceptionInfo.MULTIPLE_ID);
+                                return getControlMsgId(I_DBExceptionInfo.MULTIPLE_ID);
+                            }
+                        } catch (DBException dbexception){
+                            System.out.println("Go to DBException");
+                            System.out.println("dbexception");
+                            excCode = dbexception.getErrorCode();
+                            msgString = getSystemMessage(excCode);
+                            System.out.println(msgString);
+                            return getControlMsgId(excCode);
+                        } catch  (Exception exception){
+                            System.out.println("Go to Exception");
+                            msgString = getSystemMessage(I_DBExceptionInfo.UNKNOWN);
+                            return getControlMsgId(I_DBExceptionInfo.UNKNOWN);
+                        }
+                    } else {
+                        try {
+                            long oid = pstTaxOwnership.updateExc(this.taxOwnership);
+                        } catch (DBException dbexception){
+                            excCode = dbexception.getErrorCode();
+                            msgString = getSystemMessage(excCode);
+                            return getControlMsgId(excCode);
+                        } catch (Exception exception){
+                            msgString = getSystemMessage(I_DBExceptionInfo.UNKNOWN);
+                            return getControlMsgId(I_DBExceptionInfo.UNKNOWN);
+                        }
+                    } break;
+                
+                    
+                    
+            // function untuk menghapus data dari tabel            
+            case Command.DELETE:
+                if (oidTax != 0){
+                    try {
+                        long oid = pstTaxOwnership.deleteExc(taxOwnership);
+                    } catch (DBException dbexception){
+                        excCode = dbexception.getErrorCode();
+                        msgString = getSystemMessage(excCode);
+                        return getControlMsgId(excCode);
+                    } catch (Exception exception){
+                        msgString = getSystemMessage(I_DBExceptionInfo.UNKNOWN);
+                        return getControlMsgId(I_DBExceptionInfo.UNKNOWN);
+                    }
+                } break;
+                    
+                
+                
+                
+            // function untuk mengedit data 
+            case Command.EDIT:
+                if (oidTax != 0) {
+                    try {
+                        // Fetch the asset list for editing
+                        taxOwnership = PstTaxOwnership.fetchExc(oidTax);
+
+                        // Set assetList to request attribute
+                        request.setAttribute("taxOwnerships", taxOwnership);
+
+                        if (frmTaxOwnership.errorSize() > 0) {
+                            // Incomplete form message
+                            msgString = FRMMessage.getMsg(FRMMessage.MSG_INCOMPLATE);
+                            return RSLT_FORM_INCOMPLETE;
+                        }
+                    } catch (DBException dbexception) {
+                        // Handle database exception
+                        excCode = dbexception.getErrorCode();
+                        msgString = getSystemMessage(excCode);
+                        return getControlMsgId(excCode);
+                    } catch (Exception exception) {
+                        // Handle general exceptions
+                        System.out.println(exception);
+                        msgString = getSystemMessage(I_DBExceptionInfo.UNKNOWN);
+                        return getControlMsgId(I_DBExceptionInfo.UNKNOWN);
+                    }
+                } break;
+            default:    
         }
         return excCode;
     }
