@@ -76,10 +76,9 @@
     </style>
 </head>
 <body>
-
     <div class="main-content-wrapper">
         <div class="main-content">
-            <h1>Daftar Tipe Pajak</h1>
+            <h1>Daftar Pajak Daerah Provinsi Bali</h1>
             <table>
                 <thead>
                     <tr>

@@ -20,7 +20,7 @@
     </div>
 
     <div class="chart-container">
-        <h2>Tren Penerimaan Pajak</h2>
+        <h2>Diagram Penerimaan Pajak</h2>
         <canvas id="myChart" width="400" height="150"></canvas>
     </div>
 </div>

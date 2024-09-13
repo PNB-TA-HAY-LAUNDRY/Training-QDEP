@@ -120,6 +120,10 @@ public class DBHandler implements I_DBType
 
     public static DBConfigReader cnfReader;// = new DBConfigReader(CONFIG_FILE);
 
+    public static DBResultSet executeQueryResult(String sql) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
 
     private String tableName;
 
