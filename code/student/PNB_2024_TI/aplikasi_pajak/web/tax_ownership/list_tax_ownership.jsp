@@ -36,7 +36,7 @@
 
                     
                     if (iCommand == Command.ADD) {
-                        response.sendRedirect("frm_tax_ownership.jsp");
+                        response.sendRedirect("taxOwnershipForm.jsp");
                     }
 
                     try {
@@ -151,15 +151,14 @@
 <body>
     <div class="main-content">
         <h1>Daftar Kepemilikan Pajak</h1>
+
+        <!-- Tambahkan tombol "Tambah Data" -->
+        <form action="taxOwnershipForm.jsp" method="get">
+            <input type="hidden" name="command" value="<%= Command.ADD %>" />
+            <button type="submit" class="add-button">Tambah Data</button>
+        </form>
         
-      <!-- Add Data Button in Form using JavaScript -->
-    <form action="${pageContext.request.contextPath}/tax_ownership/frm_tax_ownership.jsp" method="get">
-        <button type="button" class="btn btn-primary btn-sm mt-4 mb-3" onclick="window.location.href='${pageContext.request.contextPath}/tax_ownership/frm_tax_ownership.jsp?command=<%= Command.ADD %>'">
-            <i class="fas fa-plus"></i> Tambah Data
-        </button>
-    </form>
-
-
+        
         <table>
             <thead>
                 <tr>
