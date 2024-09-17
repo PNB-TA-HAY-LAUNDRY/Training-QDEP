@@ -4,14 +4,18 @@
  */
 package com.dimata.form.pajak;
 
+import com.dimata.entity.pajak.PaymentStatus;
 import com.dimata.entity.pajak.PstTaxOwnership;
 import com.dimata.entity.pajak.TaxOwnership;
+import com.dimata.entity.pajak.TaxType;
 import com.dimata.qdep.db.DBException;
 import com.dimata.qdep.form.Control;
 import com.dimata.qdep.form.FRMMessage;
 import com.dimata.qdep.system.I_DBExceptionInfo;
 import com.dimata.util.Command;
 import com.dimata.util.lang.I_Language;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 import javax.servlet.http.HttpServletRequest;
 
@@ -124,44 +128,51 @@ public class CtrlTaxOwnership extends Control implements I_Language {
                 }
                 break;
 
-                
-            // function untuk menyimpan data dari form ke dalam tabel    
+            // case untuk Command.SAVE
             case Command.SAVE:
-                if (oidTax != 0) {
-                    // Fetch existing record if OID is provided
-                    try {
-                        taxOwnership = PstTaxOwnership.fetchExc(oidTax);
-                    } catch (Exception exc) {
-                        exc.printStackTrace();
-                    }
+                // Membuat objek TaxOwnership untuk menampung data yang diambil dari form
+                TaxOwnership taxOwnership = new TaxOwnership();
+
+                // Mengambil data dari form dan menyetelnya ke objek taxOwnership
+                taxOwnership.setNoPlat(request.getParameter("no_plat"));
+                taxOwnership.setNamaPemilikLama(request.getParameter("nama_pemilik_lama"));
+                taxOwnership.setNamaPemilikBaru(request.getParameter("nama_pemilik_baru"));
+                taxOwnership.setAlamatBaru(request.getParameter("alamat_baru"));
+
+                // Mengambil ID jenis pajak (tax_type_id) dari form, lalu di-convert ke Long
+                long taxTypeId = Long.parseLong(request.getParameter("tax_type_id"));
+                TaxType taxType = new TaxType(); // Asumsikan Anda punya class TaxType
+                taxType.setTaxTypeId(taxTypeId);
+                taxOwnership.setTaxType(taxType);
+
+                // Mendapatkan jumlah pajak dan tanggal dari form
+                taxOwnership.setJumlahPajak(Double.parseDouble(request.getParameter("jumlah_pajak")));
+
+                // Mengonversi tanggal dari string (dari form) ke objek Date
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    taxOwnership.setTanggalProses(dateFormat.parse(request.getParameter("tanggal_proses")));
+                    taxOwnership.setTanggalJatuhTempo(dateFormat.parse(request.getParameter("tanggal_jatuh_tempo")));
+                    taxOwnership.setTanggalPembayaran(dateFormat.parse(request.getParameter("tanggal_pembayaran")));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    // Handle error jika format tanggal tidak valid
                 }
 
-                frmTaxOwnership.requestEntityObject(taxOwnership);
-                if (frmTaxOwnership.errorSize() > 0) {
-                    msgString = FRMMessage.getMsg(FRMMessage.MSG_INCOMPLATE);
-                    return RSLT_FORM_INCOMPLETE;
-                }
+                // Mengambil status pembayaran dari form
+                String statusPembayaran = request.getParameter("status_pembayaran");
+                taxOwnership.setStatusPembayaran(PaymentStatus.valueOf(statusPembayaran.toUpperCase()));
 
                 try {
-                    // Insert if OID is 0 (new record), otherwise update existing
-                    if (taxOwnership.getOID() == 0) {
-                        boolean checkedPlat = pstTaxOwnership.checkTaxOwnership(taxOwnership.getNoPlat(), 1);
-                        if (!checkedPlat) {
-                            long oid = pstTaxOwnership.insertExc(this.taxOwnership);
-                        } else {
-                            msgString = getSystemMessage(I_DBExceptionInfo.MULTIPLE_ID);
-                            return getControlMsgId(I_DBExceptionInfo.MULTIPLE_ID);
-                        }
-                    } else {
-                        long oid = pstTaxOwnership.updateExc(this.taxOwnership);
-                    }
-                } catch (DBException dbexception) {
-                    excCode = dbexception.getErrorCode();
-                    msgString = getSystemMessage(excCode);
-                    return getControlMsgId(excCode);
-                } catch (Exception exception) {
-                    msgString = getSystemMessage(I_DBExceptionInfo.UNKNOWN);
-                    return getControlMsgId(I_DBExceptionInfo.UNKNOWN);
+                    // Memanggil method insertExc untuk menyimpan data ke database
+                    PstTaxOwnership.insertExc(taxOwnership);
+
+                    // Menambahkan pesan sukses setelah data disimpan
+                    request.setAttribute("message", "Data berhasil disimpan.");
+                } catch (DBException e) {
+                    e.printStackTrace();
+                    // Menambahkan pesan error jika terjadi kesalahan
+                    request.setAttribute("message", "Terjadi kesalahan saat menyimpan data.");
                 }
                 break;
 
