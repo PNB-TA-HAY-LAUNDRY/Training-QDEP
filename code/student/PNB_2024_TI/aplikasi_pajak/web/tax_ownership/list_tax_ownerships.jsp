@@ -14,63 +14,31 @@
 <%
     String currentPage = "list_tax_ownership";
     Vector<TaxOwnerships> listTypes = new Vector();
-    // Ambil idDeleteTax dari request
-//    long idDeleteTax = FRMQueryString.requestLong(request, "idDeleteTax");
     CtrlTaxOwnerships ctrlTaxOwnerships = new CtrlTaxOwnerships(request);
     boolean success = false;
-
-// Debug log untuk memastikan parameter diterima dengan benar
-//    out.println("Received ID for delete: " + idDeleteTax);
-
-// Menangani perintah DELETE
-//    if (idDeleteTax > 0) {
-//        try {
-//            // Panggil metode actionDelete dengan idDeleteTax
-//            int action = ctrlTaxOwnerships.actionDelete(idDeleteTax);
-//            if (action == I_DBExceptionInfo.NO_EXCEPTION) {
-//                success = true;
-//                out.println("Data berhasil dihapus.");
-//            } else {
-//                out.println("Gagal menghapus data: Kode error " + action);
-//            }
-//        } catch (Exception e) {
-//            out.println("Error saat menghapus data: " + e.getMessage());
-//        }
-//    } else {
-//        out.println("ID tidak valid untuk penghapusan.");
-//    }
-//
-//// Menampilkan hasil aksi penghapusan
-//    if (success) {
-//        // Tampilkan pesan sukses atau logika lain di halaman yang sama
-//        out.println("<p>Penghapusan berhasil.</p>");
-//    } else {
-//        // Tampilkan pesan kesalahan di halaman yang sama
-//        out.println("<p>Penghapusan gagal. Harap periksa kembali.</p>");
-//    }
-
+    
 // Mengambil parameter deleteId jika ada
-            String deleteIdStr = request.getParameter("deleteId");
-            if (deleteIdStr != null && !deleteIdStr.isEmpty()) {
-                try {
-                    long deleteId = Long.parseLong(deleteIdStr);
-                    if (deleteId > 0) {
-                        int result = PstTaxOwnerships.deleteById(deleteId);
-                        if (result > 0) {
-                            out.println("<p class='success-message'>Data pajak dengan ID " + deleteId + " berhasil dihapus.</p>");
-                        } else {
-                            out.println("<p class='error-message'>Gagal menghapus data pajak dengan ID " + deleteId + ".</p>");
-                        }
-                    } else {
-                        out.println("<p class='error-message'>ID tidak valid.</p>");
-                    }
-                } catch (DBException e) {
-                    out.println("<p class='error-message'>Gagal menghapus data pajak: " + e.getMessage() + "</p>");
-                } catch (NumberFormatException e) {
-                    out.println("<p class='error-message'>ID tidak valid.</p>");
+    String deleteIdStr = request.getParameter("deleteId");
+    if (deleteIdStr != null && !deleteIdStr.isEmpty()) {
+        try {
+            long deleteId = Long.parseLong(deleteIdStr);
+            if (deleteId > 0) {
+                int result = PstTaxOwnerships.deleteById(deleteId);
+                if (result > 0) {
+                    out.println("<p class='success-message'>Data pajak dengan ID " + deleteId + " berhasil dihapus.</p>");
+                } else {
+                    out.println("<p class='error-message'>Gagal menghapus data pajak dengan ID " + deleteId + ".</p>");
                 }
+            } else {
+                out.println("<p class='error-message'>ID tidak valid.</p>");
             }
-            
+        } catch (DBException e) {
+            out.println("<p class='error-message'>Gagal menghapus data pajak: " + e.getMessage() + "</p>");
+        } catch (NumberFormatException e) {
+            out.println("<p class='error-message'>ID tidak valid.</p>");
+        }
+    }
+
     // Always list data
     try {
         ctrlTaxOwnerships.action(Command.LIST, 0);
@@ -79,9 +47,6 @@
         log("Error retrieving data: " + e.getMessage());
     }
 
-//    if (success) {
-//        out.println("<p>Data deleted successfully.</p>");
-//    }
 %>
 <!DOCTYPE html>
 <html>
@@ -227,6 +192,12 @@
             .dialog button:hover {
                 background-color: var(--secondary-color);
             }
+            
+             #page-content-wrapper {
+                margin-left: 250px; /* Ensure this aligns with your sidebar width */
+                padding: 20px;
+                transition: margin-left 0.3s ease;
+            }
         </style>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
@@ -234,55 +205,24 @@
                 var formContainer = document.getElementById('formContainer');
                 formContainer.style.display = (formContainer.style.display === 'none' || formContainer.style.display === '') ? 'block' : 'none';
             }
-
-//            function showDialog(message) {
-//                var overlay = document.getElementById('dialogOverlay');
-//                var dialog = document.getElementById('dialog');
-//                dialog.innerHTML = '<p>' + message + '</p><button onclick="hideDialog()">OK</button>';
-//                overlay.style.display = 'flex';
-//            }
-//
-//            function hideDialog() {
-//                document.getElementById('dialogOverlay').style.display = 'none';
-//            }
-//
-//            $(document).ready(function () {
-//                $('form').on('submit', function (event) {
-//                    event.preventDefault(); // Mencegah pengiriman form default
-//
-//                    var form = $(this);
-//                    $.ajax({
-//                        type: 'POST',
-//                        url: 'process_tax_ownership.jsp', // URL JSP untuk memproses data form
-//                        data: form.serialize(), // Mengirim data form
-//                        success: function (response) {
-//                            // Update tabel dengan data terbaru
-//                            $('#data-table tbody').html($(response).find('#data-table tbody').html());
-//                            // Reset form
-//                            form[0].reset();
-//                            // Sembunyikan form setelah submit
-//                            toggleForm();
-//                            // Tampilkan dialog message
-//                            showDialog('Data berhasil disimpan!');
-//                        },
-//                        error: function (xhr, status, error) {
-//                            console.error('Terjadi kesalahan: ' + error);
-//                        }
-//                    });
-//                });
-//            });
         </script>
-    </head>
+     </head>
     <body>
-        <div class="main-content">
-            <h1>Daftar Kepemilikan Pajak</h1>
+        <!-- Include the sidebar -->
+       <%@ include file="/sidebar.jsp" %>
 
-            <!-- Button to toggle form display -->
-            <button class="form-toggle-button" onclick="toggleForm()">Tambah Data Kepemilikan Pajak</button>
 
-            <!-- Form container -->
-            <div id="formContainer" class="form-container">
-                <form method="post">
+        <!-- Main Content -->
+        <div id="page-content-wrapper">
+            <div class="main-content">
+                <h1>Daftar Kepemilikan Pajak</h1>
+
+                <!-- Button to toggle form display -->
+                <button class="form-toggle-button" onclick="toggleForm()">Tambah Data Kepemilikan Pajak</button>
+
+                <!-- Form container -->
+                <div id="formContainer" class="form-container">
+                    <form method="post">
                     <!-- Form Fields -->
                     <label for="noPlat">Nomor Plat:</label>
                     <input type="text" id="noPlat" name="noPlat" required />
@@ -324,21 +264,13 @@
                     <input type="date" id="tanggalPembayaran" name="tanggalPembayaran" />
 
                     <div class="form-buttons">
-                        <button type="submit" class="submit-button">Simpan</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Dialog message -->
-            <div id="dialogOverlay" class="dialog-overlay">
-                <div id="dialog" class="dialog">
-                    <!-- Dialog content will be injected by JavaScript -->
+                            <button type="submit" class="submit-button">Simpan</button>
+                        </div>
+                    </form>
                 </div>
-            </div>
-
+                
             <%-- Proses Data Jika Form Disubmit --%>
-            <%
-                if ("POST".equalsIgnoreCase(request.getMethod())) {
+            <%                if ("POST".equalsIgnoreCase(request.getMethod())) {
                     try {
                         TaxOwnerships taxOwnerships = new TaxOwnerships();
                         taxOwnerships.setNoPlat(request.getParameter("noPlat"));
@@ -404,6 +336,7 @@
             <table id="data-table" border="1">
                 <thead>
                     <tr>
+                        <th>No</th>
                         <th>Nomor Plat</th>
                         <th>Nama Pemilik Lama</th>
                         <th>Nama Pemilik Baru</th>
@@ -416,9 +349,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% if (listTypes != null && !listTypes.isEmpty()) {
-                for (TaxOwnerships taxOwnerships : listTypes) {%>
+                    <%
+                        int index = 1;
+                        if (listTypes != null && !listTypes.isEmpty()) {
+                            for (TaxOwnerships taxOwnerships : listTypes) {%>
                     <tr>
+                        <td><%= index++%></td>
                         <td><%= taxOwnerships.getNoPlat()%></td>
                         <td><%= taxOwnerships.getNamaPemilikLama()%></td>
                         <td><%= taxOwnerships.getNamaPemilikBaru()%></td>
@@ -428,19 +364,15 @@
                         <td><%= taxOwnerships.getTanggalProses()%></td>
                         <td><%= taxOwnerships.getTanggalJatuhTempo()%></td>
                         <td>
-                        <!-- Tombol Delete dengan parameter ID -->
-                        <form method="post" action="">
-                            <input type="hidden" name="deleteId" value="<%= taxOwnerships.getTransferTaxId()%>">
-                            <button type="submit" class="delete-btn">Hapus</button>
-                        </form>
-                    </td>
-<!--                        <td>
-                            <a href="list_tax_ownership.jsp?idDeleteTax=<%= taxOwnerships.getTransferTaxId()%>" 
-                               onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">Delete</a>
-                        </td>-->
+                            <!-- Tombol Delete dengan parameter ID -->
+                            <form method="post" action="">
+                                <input type="hidden" name="deleteId" value="<%= taxOwnerships.getTransferTaxId()%>">
+                                <button type="submit" class="delete-btn">Hapus</button>
+                            </form>
+                        </td>
                     </tr>
                     <% }
-            } else { %>
+                    } else { %>
                     <tr>
                         <td colspan="9" class="no-data">Tidak ada data yang ditemukan.</td>
                     </tr>
