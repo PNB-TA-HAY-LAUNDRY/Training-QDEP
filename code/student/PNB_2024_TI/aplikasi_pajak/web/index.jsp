@@ -14,5 +14,6 @@
     <body>
         <h1>Hello QDEP</h1>
         <a href="tax_ownership/list_tax_ownership.jsp" > Category </a>
+        <a href="tax_ownership/list_tax_ownerships.jsp" > Categorys </a>
     </body>
 </html>
