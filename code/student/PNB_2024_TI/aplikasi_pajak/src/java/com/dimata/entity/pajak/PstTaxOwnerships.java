@@ -23,6 +23,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Vector;
 
 /**
@@ -188,26 +189,47 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
         return 0;
     }
 
-   
-     public static long deleteExc(long transferTaxId) throws DBException {
-        String query = "DELETE FROM " + TBL_TAX_OWNER + " WHERE " + FLD_TRANSFER_TAX_ID + " = ?";
-        System.out.println("Executing query: " + query + " with ID: " + transferTaxId);
-
-        try (Connection conn = DBHandler.getConnection(); PreparedStatement pst = conn.prepareStatement(query)) {
-            pst.setLong(1, transferTaxId);
-            int result = pst.executeUpdate();
-            System.out.println("Result of deletion: " + result);
-
-            if (result > 0) {
-                return transferTaxId;
-            } else {
-                return 0; // Tidak ada data yang dihapus
+    public static int deleteById(long id) throws DBException {
+        Connection connection = null;
+        Statement statement = null;
+        int result = -1;
+        try {
+            connection = DBHandler.getConnection();
+            statement = connection.createStatement();
+            String sql = "DELETE FROM " + TBL_TAX_OWNER + " WHERE " + fieldNames[FLD_TRANSFER_TAX_ID] + " = " + id;
+            result = statement.executeUpdate(sql);
+            if (result == 0) {
+                throw new DBException(new PstTaxOwnerships(), DBException.RECORD_NOT_FOUND);
             }
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            throw new DBException(e);
+        } catch (SQLException sqlexception) {
+            sqlexception.printStackTrace(System.err);
+            throw new DBException(new PstTaxType(), sqlexception);
+        } finally {
+            closeStatement(statement);
+            closeConnection(connection);
         }
+        return result;
     }
+   
+//     public static long deleteExc(long transferTaxId) throws DBException {
+//        String query = "DELETE FROM " + TBL_TAX_OWNER + " WHERE " + FLD_TRANSFER_TAX_ID + " = ?";
+//        System.out.println("Executing query: " + query + " with ID: " + transferTaxId);
+//
+//        try (Connection conn = DBHandler.getConnection(); PreparedStatement pst = conn.prepareStatement(query)) {
+//            pst.setLong(1, transferTaxId);
+//            int result = pst.executeUpdate();
+//            System.out.println("Result of deletion: " + result);
+//
+//            if (result > 0) {
+//                return transferTaxId;
+//            } else {
+//                return 0; // Tidak ada data yang dihapus
+//            }
+//        } catch (SQLException e) {
+//            System.err.println("SQL Error: " + e.getMessage());
+//            throw new DBException(e);
+//        }
+//    }
      
 //     public static void deleteByTaxTypeId(long transferTaxId) throws DBException {
 //        String query = "DELETE FROM vehicle_ownership_transfer_tax_records WHERE tax_type_id = ?";
@@ -223,6 +245,8 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
 //        }
 //    }
 //
+    
+    
     @Override
     public long fetchExc(Entity ent) throws Exception {
         TaxOwnerships taxOwnerships = fetchExc(ent.getOID());

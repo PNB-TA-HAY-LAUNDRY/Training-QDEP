@@ -1,3 +1,4 @@
+<%@page import="com.dimata.qdep.db.DBException"%>
 <%@page import="com.dimata.entity.pajak.PstTaxOwnerships"%>
 <%@page import="com.dimata.entity.pajak.PaymentStatus"%>
 <%@page import="java.util.List"%>
@@ -14,40 +15,62 @@
     String currentPage = "list_tax_ownership";
     Vector<TaxOwnerships> listTypes = new Vector();
     // Ambil idDeleteTax dari request
-    long idDeleteTax = FRMQueryString.requestLong(request, "idDeleteTax");
+//    long idDeleteTax = FRMQueryString.requestLong(request, "idDeleteTax");
     CtrlTaxOwnerships ctrlTaxOwnerships = new CtrlTaxOwnerships(request);
     boolean success = false;
 
 // Debug log untuk memastikan parameter diterima dengan benar
-    out.println("Received ID for delete: " + idDeleteTax);
+//    out.println("Received ID for delete: " + idDeleteTax);
 
 // Menangani perintah DELETE
-    if (idDeleteTax > 0) {
-        try {
-            // Panggil metode actionDelete dengan idDeleteTax
-            int action = ctrlTaxOwnerships.actionDelete(idDeleteTax);
-            if (action == I_DBExceptionInfo.NO_EXCEPTION) {
-                success = true;
-                out.println("Data berhasil dihapus.");
-            } else {
-                out.println("Gagal menghapus data: Kode error " + action);
+//    if (idDeleteTax > 0) {
+//        try {
+//            // Panggil metode actionDelete dengan idDeleteTax
+//            int action = ctrlTaxOwnerships.actionDelete(idDeleteTax);
+//            if (action == I_DBExceptionInfo.NO_EXCEPTION) {
+//                success = true;
+//                out.println("Data berhasil dihapus.");
+//            } else {
+//                out.println("Gagal menghapus data: Kode error " + action);
+//            }
+//        } catch (Exception e) {
+//            out.println("Error saat menghapus data: " + e.getMessage());
+//        }
+//    } else {
+//        out.println("ID tidak valid untuk penghapusan.");
+//    }
+//
+//// Menampilkan hasil aksi penghapusan
+//    if (success) {
+//        // Tampilkan pesan sukses atau logika lain di halaman yang sama
+//        out.println("<p>Penghapusan berhasil.</p>");
+//    } else {
+//        // Tampilkan pesan kesalahan di halaman yang sama
+//        out.println("<p>Penghapusan gagal. Harap periksa kembali.</p>");
+//    }
+
+// Mengambil parameter deleteId jika ada
+            String deleteIdStr = request.getParameter("deleteId");
+            if (deleteIdStr != null && !deleteIdStr.isEmpty()) {
+                try {
+                    long deleteId = Long.parseLong(deleteIdStr);
+                    if (deleteId > 0) {
+                        int result = PstTaxOwnerships.deleteById(deleteId);
+                        if (result > 0) {
+                            out.println("<p class='success-message'>Data pajak dengan ID " + deleteId + " berhasil dihapus.</p>");
+                        } else {
+                            out.println("<p class='error-message'>Gagal menghapus data pajak dengan ID " + deleteId + ".</p>");
+                        }
+                    } else {
+                        out.println("<p class='error-message'>ID tidak valid.</p>");
+                    }
+                } catch (DBException e) {
+                    out.println("<p class='error-message'>Gagal menghapus data pajak: " + e.getMessage() + "</p>");
+                } catch (NumberFormatException e) {
+                    out.println("<p class='error-message'>ID tidak valid.</p>");
+                }
             }
-        } catch (Exception e) {
-            out.println("Error saat menghapus data: " + e.getMessage());
-        }
-    } else {
-        out.println("ID tidak valid untuk penghapusan.");
-    }
-
-// Menampilkan hasil aksi penghapusan
-    if (success) {
-        // Tampilkan pesan sukses atau logika lain di halaman yang sama
-        out.println("<p>Penghapusan berhasil.</p>");
-    } else {
-        // Tampilkan pesan kesalahan di halaman yang sama
-        out.println("<p>Penghapusan gagal. Harap periksa kembali.</p>");
-    }
-
+            
     // Always list data
     try {
         ctrlTaxOwnerships.action(Command.LIST, 0);
@@ -56,9 +79,9 @@
         log("Error retrieving data: " + e.getMessage());
     }
 
-    if (success) {
-        out.println("<p>Data deleted successfully.</p>");
-    }
+//    if (success) {
+//        out.println("<p>Data deleted successfully.</p>");
+//    }
 %>
 <!DOCTYPE html>
 <html>
@@ -405,9 +428,16 @@
                         <td><%= taxOwnerships.getTanggalProses()%></td>
                         <td><%= taxOwnerships.getTanggalJatuhTempo()%></td>
                         <td>
+                        <!-- Tombol Delete dengan parameter ID -->
+                        <form method="post" action="">
+                            <input type="hidden" name="deleteId" value="<%= taxOwnerships.getTransferTaxId()%>">
+                            <button type="submit" class="delete-btn">Hapus</button>
+                        </form>
+                    </td>
+<!--                        <td>
                             <a href="list_tax_ownership.jsp?idDeleteTax=<%= taxOwnerships.getTransferTaxId()%>" 
                                onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">Delete</a>
-                        </td>
+                        </td>-->
                     </tr>
                     <% }
             } else { %>
