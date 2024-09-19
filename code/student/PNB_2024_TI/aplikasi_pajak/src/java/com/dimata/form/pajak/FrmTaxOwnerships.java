@@ -5,7 +5,6 @@
 package com.dimata.form.pajak;
 
 import com.dimata.entity.pajak.PaymentStatus;
-import com.dimata.entity.pajak.TaxOwnership;
 import com.dimata.entity.pajak.TaxOwnerships;
 import com.dimata.entity.pajak.TaxType;
 import com.dimata.qdep.form.FRMHandler;
