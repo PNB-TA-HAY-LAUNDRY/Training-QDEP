@@ -123,7 +123,7 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
     public String getPersistentName() {
         return new PstTaxOwnerships().getClass().getName();
     }
-
+    
     public static void insertExc(TaxOwnerships taxOwnerships) throws DBException {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -253,7 +253,6 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
         ent = (Entity) taxOwnerships;
         return taxOwnerships.getOID();
     }
-
     public static TaxOwnerships fetchExc(long oid) throws DBException {
         try {
             TaxOwnerships taxOwnerships = new TaxOwnerships();

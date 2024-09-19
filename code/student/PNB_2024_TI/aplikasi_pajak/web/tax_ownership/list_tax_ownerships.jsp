@@ -11,43 +11,6 @@
 <%@page import="com.dimata.entity.pajak.TaxOwnerships"%>
 <%@page import="com.dimata.entity.pajak.TaxType"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%
-    String currentPage = "list_tax_ownership";
-    Vector<TaxOwnerships> listTypes = new Vector();
-    CtrlTaxOwnerships ctrlTaxOwnerships = new CtrlTaxOwnerships(request);
-    boolean success = false;
-    
-// Mengambil parameter deleteId jika ada
-    String deleteIdStr = request.getParameter("deleteId");
-    if (deleteIdStr != null && !deleteIdStr.isEmpty()) {
-        try {
-            long deleteId = Long.parseLong(deleteIdStr);
-            if (deleteId > 0) {
-                int result = PstTaxOwnerships.deleteById(deleteId);
-                if (result > 0) {
-                    out.println("<p class='success-message'>Data pajak dengan ID " + deleteId + " berhasil dihapus.</p>");
-                } else {
-                    out.println("<p class='error-message'>Gagal menghapus data pajak dengan ID " + deleteId + ".</p>");
-                }
-            } else {
-                out.println("<p class='error-message'>ID tidak valid.</p>");
-            }
-        } catch (DBException e) {
-            out.println("<p class='error-message'>Gagal menghapus data pajak: " + e.getMessage() + "</p>");
-        } catch (NumberFormatException e) {
-            out.println("<p class='error-message'>ID tidak valid.</p>");
-        }
-    }
-
-    // Always list data
-    try {
-        ctrlTaxOwnerships.action(Command.LIST, 0);
-        listTypes = (Vector<TaxOwnerships>) request.getAttribute("taxOwnerships");
-    } catch (Exception e) {
-        log("Error retrieving data: " + e.getMessage());
-    }
-
-%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -55,6 +18,62 @@
         <title>Daftar Kepemilikan Pajak</title>
         <style>
             /* Existing CSS styles */
+            #data-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+                background-color: var(--card-bg-color);
+                box-shadow: var(--card-shadow);
+            }
+
+            #data-table th, #data-table td {
+                padding: 8px; /* Reduced padding for a more compact look */
+                text-align: left;
+                border-bottom: 1px solid var(--border-color);
+                font-size: 12px; /* Reduced font size */
+            }
+
+            #data-table th {
+                background-color: #3498db;
+                color: white;
+                font-weight: bold;
+            }
+
+            #data-table tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            #data-table tr:hover {
+                background-color: #f1f1f1;
+            }
+
+            #data-table td {
+                font-size: 12px; /* Ensure font size matches cell padding */
+            }
+
+            .delete-btn {
+                background-color: #e74c3c;
+                color: white;
+                border: none;
+                padding: 4px 8px; /* Reduced padding for the button */
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px; /* Reduced font size */
+            }
+
+            .delete-btn:hover {
+                background-color: #c0392b;
+            }
+
+            .no-data {
+                text-align: center;
+                padding: 10px; /* Reduced padding for the no-data message */
+                color: var(--text-muted);
+                font-size: 14px; /* Adjusted font size */
+                font-weight: bold;
+            }
+
+
             :root {
                 --main-bg-color: #f4f7f9;
                 --card-bg-color: #fff;
@@ -114,7 +133,7 @@
 
             .submit-button {
                 padding: 10px 20px;
-                background-color: var(--primary-color);
+                background-color: #3498db;
                 color: white;
                 border: none;
                 border-radius: 4px;
@@ -136,7 +155,7 @@
             }
 
             .form-toggle-button {
-                background-color: var(--primary-color);
+                background-color: #3498db;
                 color: white;
                 border: none;
                 padding: 10px 20px;
@@ -192,24 +211,31 @@
             .dialog button:hover {
                 background-color: var(--secondary-color);
             }
-            
-             #page-content-wrapper {
+
+            #page-content-wrapper {
                 margin-left: 250px; /* Ensure this aligns with your sidebar width */
                 padding: 20px;
                 transition: margin-left 0.3s ease;
             }
+            .form-toggle-button i {
+                margin-right: 8px; /* Jarak antara ikon dan teks */
+            }
+
         </style>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Existing meta, style, and script tags -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
         <script>
             function toggleForm() {
                 var formContainer = document.getElementById('formContainer');
                 formContainer.style.display = (formContainer.style.display === 'none' || formContainer.style.display === '') ? 'block' : 'none';
             }
         </script>
-     </head>
+    </head>
     <body>
         <!-- Include the sidebar -->
-       <%@ include file="/sidebar.jsp" %>
+        <%@ include file="/sidebar.jsp" %>
 
 
         <!-- Main Content -->
@@ -218,168 +244,214 @@
                 <h1>Daftar Kepemilikan Pajak</h1>
 
                 <!-- Button to toggle form display -->
-                <button class="form-toggle-button" onclick="toggleForm()">Tambah Data Kepemilikan Pajak</button>
+                <button class="form-toggle-button" onclick="toggleForm()">
+                    <i class="fas fa-plus"></i> Tambah Data Kepemilikan Pajak
+                </button>
 
                 <!-- Form container -->
                 <div id="formContainer" class="form-container">
                     <form method="post">
-                    <!-- Form Fields -->
-                    <label for="noPlat">Nomor Plat:</label>
-                    <input type="text" id="noPlat" name="noPlat" required />
+                        <!-- Form Fields -->
+                        <label for="noPlat">Nomor Plat:</label>
+                        <input type="text" id="noPlat" name="noPlat" required />
 
-                    <label for="namaPemilikLama">Nama Pemilik Lama:</label>
-                    <input type="text" id="namaPemilikLama" name="namaPemilikLama" required />
+                        <label for="namaPemilikLama">Nama Pemilik Lama:</label>
+                        <input type="text" id="namaPemilikLama" name="namaPemilikLama" required />
 
-                    <label for="namaPemilikBaru">Nama Pemilik Baru:</label>
-                    <input type="text" id="namaPemilikBaru" name="namaPemilikBaru" required />
+                        <label for="namaPemilikBaru">Nama Pemilik Baru:</label>
+                        <input type="text" id="namaPemilikBaru" name="namaPemilikBaru" required />
 
-                    <label for="alamatBaru">Alamat Baru:</label>
-                    <input type="text" id="alamatBaru" name="alamatBaru" required />
+                        <label for="alamatBaru">Alamat Baru:</label>
+                        <input type="text" id="alamatBaru" name="alamatBaru" required />
 
-                    <label for="jenisPajak">Jenis Pajak:</label>
-                    <select id="jenisPajak" name="jenisPajak">
-                        <option value="pajak kendaraan bermotor">Pajak Kendaraan Bermotor</option>
-                        <option value="bea balik nama kendaraan bermotor">BEA Balik Nama Kendaraan Bermotor</option>
-                        <option value="pajak bahan bakar kendaraan bermotor">Pajak Bahan Bakar Kendaraan Bermotor</option>
-                        <option value="pajak air permukaan">Pajak Air Permukaan</option>
-                        <option value="pajak rokok">Pajak Rokok</option>
-                    </select>
+                        <label for="jenisPajak">Jenis Pajak:</label>
+                        <select id="jenisPajak" name="jenisPajak">
+                            <option value="pajak kendaraan bermotor">Pajak Kendaraan Bermotor</option>
+                            <option value="bea balik nama kendaraan bermotor">BEA Balik Nama Kendaraan Bermotor</option>
+                            <option value="pajak bahan bakar kendaraan bermotor">Pajak Bahan Bakar Kendaraan Bermotor</option>
+                            <option value="pajak air permukaan">Pajak Air Permukaan</option>
+                            <option value="pajak rokok">Pajak Rokok</option>
+                        </select>
 
-                    <label for="jumlahPajak">Jumlah Pajak:</label>
-                    <input type="number" id="jumlahPajak" name="jumlahPajak" required />
+                        <label for="jumlahPajak">Jumlah Pajak:</label>
+                        <input type="number" id="jumlahPajak" name="jumlahPajak" required />
 
-                    <label for="tanggalProses">Tanggal Proses:</label>
-                    <input type="date" id="tanggalProses" name="tanggalProses" required />
+                        <label for="tanggalProses">Tanggal Proses:</label>
+                        <input type="date" id="tanggalProses" name="tanggalProses" required />
 
-                    <label for="tanggalJatuhTempo">Tanggal Jatuh Tempo:</label>
-                    <input type="date" id="tanggalJatuhTempo" name="tanggalJatuhTempo" required />
+                        <label for="tanggalJatuhTempo">Tanggal Jatuh Tempo:</label>
+                        <input type="date" id="tanggalJatuhTempo" name="tanggalJatuhTempo" required />
 
-                    <label for="statusPembayaran">Status Pembayaran:</label>
-                    <select id="statusPembayaran" name="statusPembayaran">
-                        <option value="BELUM_DIBAYAR">Belum Dibayar</option>
-                        <option value="DIBAYAR">Dibayar</option>
-                    </select>
+                        <label for="statusPembayaran">Status Pembayaran:</label>
+                        <select id="statusPembayaran" name="statusPembayaran">
+                            <option value="BELUM_DIBAYAR">Belum Dibayar</option>
+                            <option value="DIBAYAR">Dibayar</option>
+                        </select>
 
-                    <label for="tanggalPembayaran">Tanggal Pembayaran:</label>
-                    <input type="date" id="tanggalPembayaran" name="tanggalPembayaran" />
+                        <label for="tanggalPembayaran">Tanggal Pembayaran:</label>
+                        <input type="date" id="tanggalPembayaran" name="tanggalPembayaran" />
 
-                    <div class="form-buttons">
+                        <div class="form-buttons">
                             <button type="submit" class="submit-button">Simpan</button>
                         </div>
                     </form>
                 </div>
-                
-            <%-- Proses Data Jika Form Disubmit --%>
-            <%                if ("POST".equalsIgnoreCase(request.getMethod())) {
-                    try {
-                        TaxOwnerships taxOwnerships = new TaxOwnerships();
-                        taxOwnerships.setNoPlat(request.getParameter("noPlat"));
-                        taxOwnerships.setNamaPemilikLama(request.getParameter("namaPemilikLama"));
-                        taxOwnerships.setNamaPemilikBaru(request.getParameter("namaPemilikBaru"));
-                        taxOwnerships.setAlamatBaru(request.getParameter("alamatBaru"));
-                        taxOwnerships.setJenisPajak(request.getParameter("jenisPajak"));
 
-                        // Pengecekan dan parsing jumlah pajak
-                        String jumlahPajakStr = request.getParameter("jumlahPajak");
-                        if (jumlahPajakStr != null && !jumlahPajakStr.isEmpty()) {
-                            taxOwnerships.setJumlahPajak(Double.parseDouble(jumlahPajakStr));
-                        } else {
-                            throw new Exception("Jumlah pajak tidak boleh kosong.");
+                <%-- Proses Data Jika Form Disubmit --%>
+                <%
+                    String currentPage = "list_tax_ownership";
+                    Vector<TaxOwnerships> listTypes = new Vector();
+                    CtrlTaxOwnerships ctrlTaxOwnerships = new CtrlTaxOwnerships(request);
+                    boolean success = false;
+
+                // Mengambil parameter deleteId jika ada
+                    String deleteIdStr = request.getParameter("deleteId");
+                    if (deleteIdStr != null && !deleteIdStr.isEmpty()) {
+                        try {
+                            long deleteId = Long.parseLong(deleteIdStr);
+                            if (deleteId > 0) {
+                                int result = PstTaxOwnerships.deleteById(deleteId);
+                                if (result > 0) {
+                                    out.println("<p class='success-message'>Data pajak berhasil dihapus.</p>");
+                                } else {
+                                    out.println("<p class='error-message'>Gagal menghapus data pajak dengan ID " + deleteId + ".</p>");
+                                }
+                            } else {
+                                out.println("<p class='error-message'>ID tidak valid.</p>");
+                            }
+                        } catch (DBException e) {
+                            out.println("<p class='error-message'>Gagal menghapus data pajak: " + e.getMessage() + "</p>");
+                        } catch (NumberFormatException e) {
+                            out.println("<p class='error-message'>ID tidak valid.</p>");
                         }
-
-                        // Pengecekan dan parsing tanggal proses
-                        String tanggalProsesStr = request.getParameter("tanggalProses");
-                        if (tanggalProsesStr != null && !tanggalProsesStr.isEmpty()) {
-                            taxOwnerships.setTanggalProses(java.sql.Date.valueOf(tanggalProsesStr));
-                        } else {
-                            throw new Exception("Tanggal proses tidak boleh kosong.");
-                        }
-
-                        // Pengecekan dan parsing tanggal jatuh tempo
-                        String tanggalJatuhTempoStr = request.getParameter("tanggalJatuhTempo");
-                        if (tanggalJatuhTempoStr != null && !tanggalJatuhTempoStr.isEmpty()) {
-                            taxOwnerships.setTanggalJatuhTempo(java.sql.Date.valueOf(tanggalJatuhTempoStr));
-                        } else {
-                            throw new Exception("Tanggal jatuh tempo tidak boleh kosong.");
-                        }
-
-                        // Status Pembayaran
-                        String statusPembayaranStr = request.getParameter("statusPembayaran");
-                        if (statusPembayaranStr != null && !statusPembayaranStr.isEmpty()) {
-                            PaymentStatus statusPembayaran = PaymentStatus.valueOf(statusPembayaranStr.toUpperCase());
-                            taxOwnerships.setStatusPembayaran(statusPembayaran);
-                        } else {
-                            throw new Exception("Status pembayaran tidak boleh kosong.");
-                        }
-
-                        // Pengecekan dan parsing tanggal pembayaran (opsional)
-                        String tanggalPembayaranStr = request.getParameter("tanggalPembayaran");
-                        if (tanggalPembayaranStr != null && !tanggalPembayaranStr.isEmpty()) {
-                            taxOwnerships.setTanggalPembayaran(java.sql.Date.valueOf(tanggalPembayaranStr));
-                        }
-
-                        // Buat instance PstTaxOwnership untuk memanggil metode insertExc()
-                        PstTaxOwnerships pstTaxOwnerships = new PstTaxOwnerships();
-
-                        // Gunakan metode insertExc untuk memasukkan data ke database
-                        pstTaxOwnerships.insertExc(taxOwnerships);
-                    } catch (NumberFormatException e) {
-                        out.println("<p>Format jumlah pajak tidak valid: " + e.getMessage() + "</p>");
-                    } catch (IllegalArgumentException e) {
-                        out.println("<p>Format status pembayaran tidak valid: " + e.getMessage() + "</p>");
-                    } catch (Exception e) {
                     }
-                }
-            %>
 
-            <!-- Existing table display logic for showing tax ownership data -->
-            <table id="data-table" border="1">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nomor Plat</th>
-                        <th>Nama Pemilik Lama</th>
-                        <th>Nama Pemilik Baru</th>
-                        <th>Jenis Pajak</th>
-                        <th>Jumlah Pajak</th>
-                        <th>Status Pembayaran</th>
-                        <th>Tanggal Proses</th>
-                        <th>Tanggal Jatuh Tempo</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%
-                        int index = 1;
-                        if (listTypes != null && !listTypes.isEmpty()) {
-                            for (TaxOwnerships taxOwnerships : listTypes) {%>
-                    <tr>
-                        <td><%= index++%></td>
-                        <td><%= taxOwnerships.getNoPlat()%></td>
-                        <td><%= taxOwnerships.getNamaPemilikLama()%></td>
-                        <td><%= taxOwnerships.getNamaPemilikBaru()%></td>
-                        <td><%= taxOwnerships.getJenisPajak()%></td>
-                        <td><%= taxOwnerships.getJumlahPajak()%></td>
-                        <td><%= taxOwnerships.getStatusPembayaran()%></td>
-                        <td><%= taxOwnerships.getTanggalProses()%></td>
-                        <td><%= taxOwnerships.getTanggalJatuhTempo()%></td>
-                        <td>
-                            <!-- Tombol Delete dengan parameter ID -->
-                            <form method="post" action="">
-                                <input type="hidden" name="deleteId" value="<%= taxOwnerships.getTransferTaxId()%>">
-                                <button type="submit" class="delete-btn">Hapus</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <% }
+                    // Always list data
+                    try {
+                        ctrlTaxOwnerships.action(Command.LIST, 0);
+                        listTypes = (Vector<TaxOwnerships>) request.getAttribute("taxOwnerships");
+                    } catch (Exception e) {
+                        log("Error retrieving data: " + e.getMessage());
+                    }
+
+                    if ("POST".equalsIgnoreCase(request.getMethod())) {
+                        try {
+                            TaxOwnerships taxOwnerships = new TaxOwnerships();
+                            taxOwnerships.setNoPlat(request.getParameter("noPlat"));
+                            taxOwnerships.setNamaPemilikLama(request.getParameter("namaPemilikLama"));
+                            taxOwnerships.setNamaPemilikBaru(request.getParameter("namaPemilikBaru"));
+                            taxOwnerships.setAlamatBaru(request.getParameter("alamatBaru"));
+                            taxOwnerships.setJenisPajak(request.getParameter("jenisPajak"));
+
+                            // Pengecekan dan parsing jumlah pajak
+                            String jumlahPajakStr = request.getParameter("jumlahPajak");
+                            if (jumlahPajakStr != null && !jumlahPajakStr.isEmpty()) {
+                                taxOwnerships.setJumlahPajak(Double.parseDouble(jumlahPajakStr));
+                            } else {
+                                throw new Exception("Jumlah pajak tidak boleh kosong.");
+                            }
+
+                            // Pengecekan dan parsing tanggal proses
+                            String tanggalProsesStr = request.getParameter("tanggalProses");
+                            if (tanggalProsesStr != null && !tanggalProsesStr.isEmpty()) {
+                                taxOwnerships.setTanggalProses(java.sql.Date.valueOf(tanggalProsesStr));
+                            } else {
+                                throw new Exception("Tanggal proses tidak boleh kosong.");
+                            }
+
+                            // Pengecekan dan parsing tanggal jatuh tempo
+                            String tanggalJatuhTempoStr = request.getParameter("tanggalJatuhTempo");
+                            if (tanggalJatuhTempoStr != null && !tanggalJatuhTempoStr.isEmpty()) {
+                                taxOwnerships.setTanggalJatuhTempo(java.sql.Date.valueOf(tanggalJatuhTempoStr));
+                            } else {
+                                throw new Exception("Tanggal jatuh tempo tidak boleh kosong.");
+                            }
+
+                            // Status Pembayaran
+                            String statusPembayaranStr = request.getParameter("statusPembayaran");
+                            if (statusPembayaranStr != null && !statusPembayaranStr.isEmpty()) {
+                                PaymentStatus statusPembayaran = PaymentStatus.valueOf(statusPembayaranStr.toUpperCase());
+                                taxOwnerships.setStatusPembayaran(statusPembayaran);
+                            } else {
+                                throw new Exception("Status pembayaran tidak boleh kosong.");
+                            }
+
+                            // Pengecekan dan parsing tanggal pembayaran (opsional)
+                            String tanggalPembayaranStr = request.getParameter("tanggalPembayaran");
+                            if (tanggalPembayaranStr != null && !tanggalPembayaranStr.isEmpty()) {
+                                taxOwnerships.setTanggalPembayaran(java.sql.Date.valueOf(tanggalPembayaranStr));
+                            }
+
+                            // Buat instance PstTaxOwnership untuk memanggil metode insertExc()
+                            PstTaxOwnerships pstTaxOwnerships = new PstTaxOwnerships();
+                            // Gunakan metode insertExc untuk memasukkan data ke database
+                            pstTaxOwnerships.insertExc(taxOwnerships);
+
+                            // Redirect ke halaman daftar setelah berhasil menyimpan data
+                            response.sendRedirect("list_tax_ownerships.jsp");
+
+                        } catch (NumberFormatException e) {
+                            out.println("<p>Format jumlah pajak tidak valid: " + e.getMessage() + "</p>");
+                        } catch (IllegalArgumentException e) {
+                            out.println("<p>Format status pembayaran tidak valid: " + e.getMessage() + "</p>");
+                        } catch (Exception e) {
+                        }
+                    }
+                %>
+
+
+                <!-- Existing table display logic for showing tax ownership data -->
+                <table id="data-table" border="1">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nomor Plat</th>
+                            <th>Nama Pemilik Lama</th>
+                            <th>Nama Pemilik Baru</th>
+                            <th>Jenis Pajak</th>
+                            <th>Jumlah Pajak</th>
+                            <th>Status Pembayaran</th>
+                            <th>Tanggal Proses</th>
+                            <th>Tanggal Jatuh Tempo</th>
+                            <th>Tanggal Pembayaran</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%
+                            int index = 1;
+                            if (listTypes != null && !listTypes.isEmpty()) {
+                                for (TaxOwnerships taxOwnerships : listTypes) {%>
+                        <tr>
+                            <td><%= index++%></td>
+                            <td><%= taxOwnerships.getNoPlat()%></td>
+                            <td><%= taxOwnerships.getNamaPemilikLama()%></td>
+                            <td><%= taxOwnerships.getNamaPemilikBaru()%></td>
+                            <td><%= taxOwnerships.getJenisPajak()%></td>
+                            <td><%= taxOwnerships.getJumlahPajak()%></td>
+                            <td><%= taxOwnerships.getStatusPembayaran()%></td>
+                            <td><%= taxOwnerships.getTanggalProses()%></td>
+                            <td><%= taxOwnerships.getTanggalJatuhTempo()%></td>
+                            <td><%= taxOwnerships.getTanggalPembayaran() != null ? taxOwnerships.getTanggalPembayaran() : ""%></td>
+
+
+                            <td>
+                                <!-- Tombol Delete dengan parameter ID -->
+                                <form method="post" action="">
+                                    <input type="hidden" name="deleteId" value="<%= taxOwnerships.getTransferTaxId()%>">
+                                    <button type="submit" class="delete-btn">Hapus</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }
                     } else { %>
-                    <tr>
-                        <td colspan="9" class="no-data">Tidak ada data yang ditemukan.</td>
-                    </tr>
-                    <% }%>
-                </tbody>
-            </table>
+                        <tr>
+                            <td colspan="9" class="no-data">Tidak ada data yang ditemukan.</td>
+                        </tr>
+                        <% }%>
+                    </tbody>
+                </table>
 
-        </div>
+            </div>
     </body>
 </html>

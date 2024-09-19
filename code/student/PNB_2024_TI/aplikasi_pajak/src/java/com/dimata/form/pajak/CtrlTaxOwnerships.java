@@ -131,49 +131,49 @@ public class CtrlTaxOwnerships extends Control implements I_Language {
                 break;
 
             // case untuk Command.SAVE
-            case Command.SAVE:
-                // Membuat objek TaxOwnership untuk menampung data yang diambil dari form
-                TaxOwnerships taxOwnerships = new TaxOwnerships();
-
-                // Mengambil data dari form dan menyetelnya ke objek taxOwnership
-                taxOwnerships.setNoPlat(request.getParameter("no_plat"));
-                taxOwnerships.setNamaPemilikLama(request.getParameter("nama_pemilik_lama"));
-                taxOwnerships.setNamaPemilikBaru(request.getParameter("nama_pemilik_baru"));
-                taxOwnerships.setAlamatBaru(request.getParameter("alamat_baru"));
-                taxOwnerships.setJenisPajak(request.getParameter("jenisPajak"));
-
-                
-
-                // Mendapatkan jumlah pajak dan tanggal dari form
-                taxOwnerships.setJumlahPajak(Double.parseDouble(request.getParameter("jumlah_pajak")));
-
-                // Mengonversi tanggal dari string (dari form) ke objek Date
-                try {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                    taxOwnerships.setTanggalProses(dateFormat.parse(request.getParameter("tanggal_proses")));
-                    taxOwnerships.setTanggalJatuhTempo(dateFormat.parse(request.getParameter("tanggal_jatuh_tempo")));
-                    taxOwnerships.setTanggalPembayaran(dateFormat.parse(request.getParameter("tanggal_pembayaran")));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                    // Handle error jika format tanggal tidak valid
-                }
-
-                // Mengambil status pembayaran dari form
-                String statusPembayaran = request.getParameter("status_pembayaran");
-                taxOwnerships.setStatusPembayaran(PaymentStatus.valueOf(statusPembayaran.toUpperCase()));
-
-                try {
-                    // Memanggil method insertExc untuk menyimpan data ke database
-                    PstTaxOwnerships.insertExc(taxOwnerships);
-
-                    // Menambahkan pesan sukses setelah data disimpan
-                    request.setAttribute("message", "Data berhasil disimpan.");
-                } catch (DBException e) {
-                    e.printStackTrace();
-                    // Menambahkan pesan error jika terjadi kesalahan
-                    request.setAttribute("message", "Terjadi kesalahan saat menyimpan data.");
-                }
-                break;
+//            case Command.SAVE:
+//                // Membuat objek TaxOwnership untuk menampung data yang diambil dari form
+//                TaxOwnerships taxOwnerships = new TaxOwnerships();
+//
+//                // Mengambil data dari form dan menyetelnya ke objek taxOwnership
+//                taxOwnerships.setNoPlat(request.getParameter("no_plat"));
+//                taxOwnerships.setNamaPemilikLama(request.getParameter("nama_pemilik_lama"));
+//                taxOwnerships.setNamaPemilikBaru(request.getParameter("nama_pemilik_baru"));
+//                taxOwnerships.setAlamatBaru(request.getParameter("alamat_baru"));
+//                taxOwnerships.setJenisPajak(request.getParameter("jenisPajak"));
+//
+//                
+//
+//                // Mendapatkan jumlah pajak dan tanggal dari form
+//                taxOwnerships.setJumlahPajak(Double.parseDouble(request.getParameter("jumlah_pajak")));
+//
+//                // Mengonversi tanggal dari string (dari form) ke objek Date
+//                try {
+//                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//                    taxOwnerships.setTanggalProses(dateFormat.parse(request.getParameter("tanggal_proses")));
+//                    taxOwnerships.setTanggalJatuhTempo(dateFormat.parse(request.getParameter("tanggal_jatuh_tempo")));
+//                    taxOwnerships.setTanggalPembayaran(dateFormat.parse(request.getParameter("tanggal_pembayaran")));
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                    // Handle error jika format tanggal tidak valid
+//                }
+//
+//                // Mengambil status pembayaran dari form
+//                String statusPembayaran = request.getParameter("status_pembayaran");
+//                taxOwnerships.setStatusPembayaran(PaymentStatus.valueOf(statusPembayaran.toUpperCase()));
+//
+//                try {
+//                    // Memanggil method insertExc untuk menyimpan data ke database
+//                    PstTaxOwnerships.insertExc(taxOwnerships);
+//
+//                    // Menambahkan pesan sukses setelah data disimpan
+//                    request.setAttribute("message", "Data berhasil disimpan.");
+//                } catch (DBException e) {
+//                    e.printStackTrace();
+//                    // Menambahkan pesan error jika terjadi kesalahan
+//                    request.setAttribute("message", "Terjadi kesalahan saat menyimpan data.");
+//                }
+//                break;
 
             // function untuk menghapus data dari tabel            
 //            case Command.DELETE:
