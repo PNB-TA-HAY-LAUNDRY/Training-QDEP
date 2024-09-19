@@ -12,35 +12,54 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
     String currentPage = "list_tax_ownership";
-    Vector<TaxOwnership> listTypes = new Vector<TaxOwnership>();  // Updated line
-    int iCommand = FRMQueryString.requestCommand(request);
-    long idDeleteTax = FRMQueryString.requestLong(request, "idDeleteTax");
-    CtrlTaxOwnership ctrlTaxOwnership = new CtrlTaxOwnership(request);
-    boolean success = false;
+    Vector<TaxOwnership> listTypes = new Vector();
+    // Ambil idDeleteTax dari request
+long idDeleteTax = FRMQueryString.requestLong(request, "idDeleteTax");
+CtrlTaxOwnership ctrlTaxOwnership = new CtrlTaxOwnership(request);
+boolean success = false;
 
-    // Handle DELETE command
-    if (iCommand == Command.DELETE) {
-        if (idDeleteTax != 0) {
-            try {
-                int action = ctrlTaxOwnership.action(iCommand, idDeleteTax);
-                if (action == I_DBExceptionInfo.NO_EXCEPTION) {
-                    success = true;
-                }
-            } catch (Exception e) {
-                out.println("Error delete data: " + e);
-            }
+// Debug log untuk memastikan parameter diterima dengan benar
+out.println("Received ID for delete: " + idDeleteTax);
+
+// Menangani perintah DELETE
+if (idDeleteTax > 0) {
+    try {
+        // Panggil metode actionDelete dengan idDeleteTax
+        int action = ctrlTaxOwnership.actionDelete(idDeleteTax);
+        if (action == I_DBExceptionInfo.NO_EXCEPTION) {
+            success = true;
+            out.println("Data berhasil dihapus.");
+        } else {
+            out.println("Gagal menghapus data: Kode error " + action);
         }
+    } catch (Exception e) {
+        out.println("Error saat menghapus data: " + e.getMessage());
     }
+} else {
+    out.println("ID tidak valid untuk penghapusan.");
+}
 
-    if (iCommand == Command.ADD) {
-        // Do not redirect; form will be shown with JavaScript
-    }
+// Menampilkan hasil aksi penghapusan
+if (success) {
+    // Tampilkan pesan sukses atau logika lain di halaman yang sama
+    out.println("<p>Penghapusan berhasil.</p>");
+} else {
+    // Tampilkan pesan kesalahan di halaman yang sama
+    out.println("<p>Penghapusan gagal. Harap periksa kembali.</p>");
+}
 
+
+
+    // Always list data
     try {
         ctrlTaxOwnership.action(Command.LIST, 0);
         listTypes = (Vector<TaxOwnership>) request.getAttribute("taxOwnerships");
     } catch (Exception e) {
-        log("Error: " + e);
+        log("Error retrieving data: " + e.getMessage());
+    }
+
+    if (success) {
+        out.println("<p>Data deleted successfully.</p>");
     }
 %>
 <!DOCTYPE html>
@@ -195,42 +214,42 @@
                 formContainer.style.display = (formContainer.style.display === 'none' || formContainer.style.display === '') ? 'block' : 'none';
             }
 
-            function showDialog(message) {
-                var overlay = document.getElementById('dialogOverlay');
-                var dialog = document.getElementById('dialog');
-                dialog.innerHTML = '<p>' + message + '</p><button onclick="hideDialog()">OK</button>';
-                overlay.style.display = 'flex';
-            }
-
-            function hideDialog() {
-                document.getElementById('dialogOverlay').style.display = 'none';
-            }
-
-            $(document).ready(function () {
-                $('form').on('submit', function (event) {
-                    event.preventDefault(); // Mencegah pengiriman form default
-
-                    var form = $(this);
-                    $.ajax({
-                        type: 'POST',
-                        url: 'process_tax_ownership.jsp', // URL JSP untuk memproses data form
-                        data: form.serialize(), // Mengirim data form
-                        success: function (response) {
-                            // Update tabel dengan data terbaru
-                            $('#data-table tbody').html($(response).find('#data-table tbody').html());
-                            // Reset form
-                            form[0].reset();
-                            // Sembunyikan form setelah submit
-                            toggleForm();
-                            // Tampilkan dialog message
-                            showDialog('Data berhasil disimpan!');
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('Terjadi kesalahan: ' + error);
-                        }
-                    });
-                });
-            });
+//            function showDialog(message) {
+//                var overlay = document.getElementById('dialogOverlay');
+//                var dialog = document.getElementById('dialog');
+//                dialog.innerHTML = '<p>' + message + '</p><button onclick="hideDialog()">OK</button>';
+//                overlay.style.display = 'flex';
+//            }
+//
+//            function hideDialog() {
+//                document.getElementById('dialogOverlay').style.display = 'none';
+//            }
+//
+//            $(document).ready(function () {
+//                $('form').on('submit', function (event) {
+//                    event.preventDefault(); // Mencegah pengiriman form default
+//
+//                    var form = $(this);
+//                    $.ajax({
+//                        type: 'POST',
+//                        url: 'process_tax_ownership.jsp', // URL JSP untuk memproses data form
+//                        data: form.serialize(), // Mengirim data form
+//                        success: function (response) {
+//                            // Update tabel dengan data terbaru
+//                            $('#data-table tbody').html($(response).find('#data-table tbody').html());
+//                            // Reset form
+//                            form[0].reset();
+//                            // Sembunyikan form setelah submit
+//                            toggleForm();
+//                            // Tampilkan dialog message
+//                            showDialog('Data berhasil disimpan!');
+//                        },
+//                        error: function (xhr, status, error) {
+//                            console.error('Terjadi kesalahan: ' + error);
+//                        }
+//                    });
+//                });
+//            });
         </script>
     </head>
     <body>
@@ -362,13 +381,11 @@
 
                         // Gunakan metode insertExc untuk memasukkan data ke database
                         pstTaxOwnership.insertExc(taxOwnership);
-                        out.println("<p>Data berhasil disimpan!</p>");
                     } catch (NumberFormatException e) {
                         out.println("<p>Format jumlah pajak tidak valid: " + e.getMessage() + "</p>");
                     } catch (IllegalArgumentException e) {
                         out.println("<p>Format status pembayaran tidak valid: " + e.getMessage() + "</p>");
                     } catch (Exception e) {
-                        out.println("<p>Terjadi kesalahan: " + e.getMessage() + "</p>");
                     }
                 }
             %>
@@ -388,6 +405,7 @@
                         <th>Tanggal Jatuh Tempo</th>
                         <th>Status Pembayaran</th>
                         <th>Tanggal Pembayaran</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -420,9 +438,14 @@
                         <td><%= taxOwnership.getTanggalJatuhTempo()%></td>
                         <td><%= taxOwnership.getStatusPembayaran()%></td>
                         <td><%= taxOwnership.getTanggalPembayaran() != null ? taxOwnership.getTanggalPembayaran() : ""%></td>
+                        <td>
+                            <a href="list_tax_ownership.jsp?idDeleteTax=<%= taxOwnership.getTransferTaxId()%>" 
+                               onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">Delete</a>
+
+                        </td>
                     </tr>
                     <% }
-                    }%>
+                        }%>
                 </tbody>
             </table>
         </div>

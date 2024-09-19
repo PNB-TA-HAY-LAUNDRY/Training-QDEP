@@ -175,26 +175,41 @@ public class PstTaxOwnership extends DBHandler implements I_DBInterface, I_DBTyp
         return 0;
     }
 
-    @Override
-    public long deleteExc(Entity ent) throws Exception {
-        if (ent == null) {
-            throw new DBException(this, DBException.RECORD_NOT_FOUND);
-        }
-        return deleteExc(ent.getOID());
-    }
+    // Deletes an AssetLists based on its OID
+     public static long deleteExc(long transferTaxId) throws DBException {
+        String query = "DELETE FROM " + TBL_TAX_OWNER + " WHERE " + FLD_TRANSFER_TAX_ID + " = ?";
+        System.out.println("Executing query: " + query + " with ID: " + transferTaxId);
 
-    public long deleteExc(long oid) throws DBException {
-        try {
-            PstTaxOwnership pstTaxOwnership = new PstTaxOwnership(oid);
-            pstTaxOwnership.delete();
-        } catch (DBException dbe) {
-            throw dbe;
-        } catch (Exception e) {
-            throw new DBException(new PstTaxOwnership(0), DBException.UNKNOWN);
-        }
-        return oid;
-    }
+        try (Connection conn = DBHandler.getConnection(); PreparedStatement pst = conn.prepareStatement(query)) {
+            pst.setLong(1, transferTaxId);
+            int result = pst.executeUpdate();
+            System.out.println("Result of deletion: " + result);
 
+            if (result > 0) {
+                return transferTaxId;
+            } else {
+                return 0; // Tidak ada data yang dihapus
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+            throw new DBException(e);
+        }
+    }
+     
+//     public static void deleteByTaxTypeId(long transferTaxId) throws DBException {
+//        String query = "DELETE FROM vehicle_ownership_transfer_tax_records WHERE tax_type_id = ?";
+//        System.out.println("Executing related data deletion query: " + query + " with ID: " + transferTaxId);
+//
+//        try (Connection conn = DBHandler.getConnection(); PreparedStatement pst = conn.prepareStatement(query)) {
+//            pst.setLong(1, transferTaxId);
+//            int result = pst.executeUpdate();
+//            System.out.println("Result of related data deletion: " + result);
+//        } catch (SQLException e) {
+//            System.err.println("SQL Error: " + e.getMessage());
+//            throw new DBException(e);
+//        }
+//    }
+//
     @Override
     public long fetchExc(Entity ent) throws Exception {
         TaxOwnership taxOwnership = fetchExc(ent.getOID());
@@ -349,6 +364,11 @@ public class PstTaxOwnership extends DBHandler implements I_DBInterface, I_DBTyp
 
     @Override
     public long insertExc(Entity ent) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public long deleteExc(Entity ent) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

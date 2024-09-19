@@ -32,6 +32,7 @@ public class CtrlTaxOwnership extends Control implements I_Language {
     public static int RSLT_EST_CODE_EXIST = 2;
     public static int RSLT_FORM_INCOMPLETE = 3;
     public static int RSLT_DELETE_RESTRICT = 4;
+    public static final int DELETE = 1; // Sesuaikan dengan nilai yang digunakan
 
     public static String[][] resultText = {
         {"Berhasil", "Tidak dapat diproses", "Kategori sudah ada", "Data tidak lengkap", "Kategori tidak bisa dihapus, masih dipakai modul lain ..."},
@@ -108,7 +109,7 @@ public class CtrlTaxOwnership extends Control implements I_Language {
         return start;
     }
 
-    public int action(int cmd, long oidTax) {
+    public int action(int cmd, long transferTaxId) {
         msgString = "";
         int excCode = I_DBExceptionInfo.NO_EXCEPTION;
         int rsCode = RSLT_OK;
@@ -177,36 +178,32 @@ public class CtrlTaxOwnership extends Control implements I_Language {
                 break;
 
             // function untuk menghapus data dari tabel            
-            case Command.DELETE:
-                if (oidTax != 0) {
-                    try {
-                        long oid = pstTaxOwnership.deleteExc(oidTax);
-                        if (oid != 0) {
-                            msgString = "Data berhasil dihapus.";
-                        } else {
-                            msgString = "Data gagal dihapus.";
-                        }
-                    } catch (DBException dbexception) {
-                        excCode = dbexception.getErrorCode();
-                        msgString = getSystemMessage(excCode);
-                        return getControlMsgId(excCode);
-                    } catch (Exception exception) {
-                        msgString = getSystemMessage(I_DBExceptionInfo.UNKNOWN);
-                        return getControlMsgId(I_DBExceptionInfo.UNKNOWN);
-                    }
-                }
-                break;
-
+//            case Command.DELETE:
+//                if (transferTaxId != 0) {
+//                    try {
+//                        long oid = PstTaxOwnership.deleteExc(transferTaxId);
+//                        msgString = "Data berhasil dihapus.";
+//                    } catch (DBException dbexc) {
+//                        excCode = dbexc.getErrorCode();
+//                        msgString = getSystemMessage(excCode);
+//                        return getControlMsgId(excCode);
+//                    } catch (Exception exc) {
+//                        msgString = getSystemMessage(I_DBExceptionInfo.UNKNOWN);
+//                        return getControlMsgId(I_DBExceptionInfo.UNKNOWN);
+//                    }
+//                } else {
+//                    msgString = "ID tidak valid untuk penghapusan.";
+//                }
+//                break;
             // function untuk mengedit data 
             case Command.EDIT:
-                if (oidTax != 0) {
+                if (transferTaxId != 0) {
                     try {
                         // Fetch the asset list for editing
-                        taxOwnership = PstTaxOwnership.fetchExc(oidTax);
+                        PstTaxOwnership.fetchExc(transferTaxId);
 
                         // Set assetList to request attribute
-                        request.setAttribute("taxOwnerships", taxOwnership);
-
+//                        request.setAttribute("taxOwnerships", taxOwnership);
                         if (frmTaxOwnership.errorSize() > 0) {
                             // Incomplete form message
                             msgString = FRMMessage.getMsg(FRMMessage.MSG_INCOMPLATE);
@@ -229,4 +226,44 @@ public class CtrlTaxOwnership extends Control implements I_Language {
         }
         return excCode;
     }
+    
+
+     public int actionDelete(long transferTaxId) {
+        msgString = "";
+        int excCode = I_DBExceptionInfo.NO_EXCEPTION;
+
+        if (transferTaxId != 0) {
+            try {
+//                // Pertama, hapus relasi terkait jika ada
+//                deleteRelatedData(transferTaxId);
+
+                // Kemudian, hapus data utama
+                long oid = PstTaxOwnership.deleteExc(transferTaxId);
+                if (oid != 0) {
+                    msgString = "Data berhasil dihapus.";
+                } else {
+                    msgString = "Gagal menghapus data. ID tidak ditemukan.";
+                    return RSLT_UNKNOWN_ERROR;
+                }
+            } catch (DBException dbexc) {
+                excCode = dbexc.getErrorCode();
+                msgString = getSystemMessage(excCode);
+                return getControlMsgId(excCode);
+            } catch (Exception exc) {
+                msgString = getSystemMessage(I_DBExceptionInfo.UNKNOWN);
+                return getControlMsgId(I_DBExceptionInfo.UNKNOWN);
+            }
+        } else {
+            msgString = "ID tidak valid untuk penghapusan.";
+            return RSLT_FORM_INCOMPLETE;
+        }
+
+        return excCode;
+    }
+
+//    private void deleteRelatedData(long transferTaxId) throws DBException {
+//        System.out.println("Deleting related data for ID: " + transferTaxId);
+//        PstTaxOwnership.deleteByTaxTypeId(transferTaxId);
+//    }
+
 }

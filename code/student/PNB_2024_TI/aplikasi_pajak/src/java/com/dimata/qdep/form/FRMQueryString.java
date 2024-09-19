@@ -109,15 +109,20 @@ public class FRMQueryString {
     }
 
     
-    public static int  requestInt(HttpServletRequest req, String paramName) {
-        String sParam = (((String)req.getParameter(paramName)) == null) ? "0" : ((String)(req.getParameter(paramName)));
-        try {
-            int iParam = Integer.parseInt(sParam);        
-            return iParam;
-        }catch(Exception e) {
-            return 0;
-        }
+    public static int requestInt(HttpServletRequest req, String paramName) {
+    String sParam = req.getParameter(paramName);
+    System.out.println("Parameter " + paramName + ": " + sParam); // Debug log
+    if (sParam == null || sParam.isEmpty()) {
+        return 0;
     }
+    try {
+        return Integer.parseInt(sParam);
+    } catch (NumberFormatException e) {
+        System.err.println("Error parsing integer: " + e.getMessage()); // Debug log
+        return 0;
+    }
+}
+
 
     public static long requestLong(HttpServletRequest req, String paramName) {
         String sParam = (((String)req.getParameter(paramName)) == null) ? "0" : ((String)(req.getParameter(paramName)));
@@ -242,8 +247,9 @@ public class FRMQueryString {
     
     
     public static int requestCommand(HttpServletRequest req) {
-        return requestInt(req, CMD);
-    }
+    return requestInt(req, "command");
+}
+
 
     /**
      * @return the dateFormat

@@ -110,6 +110,14 @@ public class DBException extends Exception  implements I_DBExceptionInfo
 
     }
 
+    public DBException(SQLException e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public DBException(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
 
 
     public int getErrorCode()
