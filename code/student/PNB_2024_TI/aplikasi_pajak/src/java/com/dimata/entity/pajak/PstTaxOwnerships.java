@@ -31,7 +31,8 @@ import java.util.Vector;
  * @author ihsan
  */
 public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBType, I_PersintentExc, I_Language {
-   public static final String TBL_TAX_OWNER = "vehicle_ownership_transfer_tax_record";
+
+    public static final String TBL_TAX_OWNER = "vehicle_ownership_transfer_tax_record";
 
     public static final int FLD_TRANSFER_TAX_ID = 0;
     public static final int FLD_NO_PLAT = 1;
@@ -123,7 +124,7 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
     public String getPersistentName() {
         return new PstTaxOwnerships().getClass().getName();
     }
-    
+
     public static void insertExc(TaxOwnerships taxOwnerships) throws DBException {
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -170,23 +171,66 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
 
     public long updateExc(TaxOwnerships taxOwnerships) throws DBException {
         try {
-            PstTaxOwnerships pstTaxOwnerships = new PstTaxOwnerships(taxOwnerships.getOID());
-            pstTaxOwnerships.setString(FLD_NO_PLAT, taxOwnerships.getNoPlat());
-            pstTaxOwnerships.setString(FLD_OLD_NAME, taxOwnerships.getNamaPemilikLama());
-            pstTaxOwnerships.setString(FLD_NEW_NAME, taxOwnerships.getNamaPemilikBaru());
-            pstTaxOwnerships.setString(FLD_NEW_ADDRESS, taxOwnerships.getAlamatBaru());
-            pstTaxOwnerships.setString(FLD_TAX_TYPE, taxOwnerships.getJenisPajak());
-            pstTaxOwnerships.setDouble(FLD_TOTAL_TAX, taxOwnerships.getJumlahPajak());
-            pstTaxOwnerships.setString(FLD_PAY_STATUS, taxOwnerships.getStatusPembayaran().getStatus());
-            pstTaxOwnerships.setDate(FLD_PROCESS_DATE, taxOwnerships.getTanggalProses());
-            pstTaxOwnerships.setDate(FLD_DUE_DATE, taxOwnerships.getTanggalJatuhTempo());
-            pstTaxOwnerships.setDate(FLD_PAY_DATE, taxOwnerships.getTanggalPembayaran());
-        } catch (DBException e) {
-            throw e;
+            // Menyusun query update SQL berdasarkan NoPlat
+            String sql = "UPDATE " + TBL_TAX_OWNER + " SET "
+                    + FLD_OLD_NAME + " = ?, " //nama pemilik lama
+                    + FLD_NEW_NAME + " = ?, " //nama pemilik baru
+                    + FLD_NEW_ADDRESS + " = ?, " //alamat baru
+                    + FLD_TAX_TYPE + " = ?, " // jenis pajak
+                    + FLD_TOTAL_TAX + " = ?, " //jumlah pajak
+                    + FLD_PROCESS_DATE + " = ?, " //tanggal proses
+                    + FLD_DUE_DATE + " = ?, " // tanggal jatuh tempo
+                    + FLD_PAY_STATUS + " = ?, " // status pembayaran
+                    + FLD_PAY_DATE + " = ? " // tanggal pembayaran
+                    + "WHERE " + FLD_NO_PLAT + " = ?";  // no plat
+
+            // Logging untuk memeriksa query dan parameternya
+            System.out.println("SQL: " + sql);
+            System.out.println("Parameters:");
+            System.out.println("1: " + taxOwnerships.getNamaPemilikLama());
+            System.out.println("2: " + taxOwnerships.getNamaPemilikBaru());
+            System.out.println("3: " + taxOwnerships.getAlamatBaru());
+            System.out.println("4: " + taxOwnerships.getJenisPajak());
+            System.out.println("5: " + taxOwnerships.getJumlahPajak());
+            System.out.println("6: " + taxOwnerships.getTanggalProses());
+            System.out.println("7: " + taxOwnerships.getTanggalJatuhTempo());
+            System.out.println("8: " + taxOwnerships.getStatusPembayaran().toString());
+            System.out.println("9: " + taxOwnerships.getTanggalPembayaran());
+            System.out.println("10: " + taxOwnerships.getNoPlat());
+
+            // Menyiapkan PreparedStatement
+            PreparedStatement pstmt = getConnection().prepareStatement(sql);
+            pstmt.setString(1, taxOwnerships.getNamaPemilikLama());
+            pstmt.setString(2, taxOwnerships.getNamaPemilikBaru());
+            pstmt.setString(3, taxOwnerships.getAlamatBaru());
+            pstmt.setString(4, taxOwnerships.getJenisPajak());
+            pstmt.setDouble(5, taxOwnerships.getJumlahPajak());
+            pstmt.setDate(6, (Date) taxOwnerships.getTanggalProses());
+            pstmt.setDate(7, (Date) taxOwnerships.getTanggalJatuhTempo());
+            pstmt.setString(8, taxOwnerships.getStatusPembayaran().toString());
+            pstmt.setDate(9, (Date) taxOwnerships.getTanggalPembayaran());
+            pstmt.setString(10, taxOwnerships.getNoPlat());
+
+            // Eksekusi update
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new DBException(this, DBException.RECORD_NOT_FOUND);
+            }
+
+            // Commit transaksi jika diperlukan
+            getConnection().commit();
+
+            pstmt.close();
+            return affectedRows; // Mengembalikan jumlah baris yang diperbarui
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Tambahkan ini untuk melihat detail error
+            throw new DBException(this, DBException.SQL_ERROR);
         } catch (Exception e) {
+            e.printStackTrace(); // Tambahkan ini untuk melihat detail error
             throw new DBException(this, DBException.UNKNOWN);
         }
-        return 0;
     }
 
     public static int deleteById(long id) throws DBException {
@@ -210,7 +254,7 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
         }
         return result;
     }
-   
+
 //     public static long deleteExc(long transferTaxId) throws DBException {
 //        String query = "DELETE FROM " + TBL_TAX_OWNER + " WHERE " + FLD_TRANSFER_TAX_ID + " = ?";
 //        System.out.println("Executing query: " + query + " with ID: " + transferTaxId);
@@ -230,7 +274,6 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
 //            throw new DBException(e);
 //        }
 //    }
-     
 //     public static void deleteByTaxTypeId(long transferTaxId) throws DBException {
 //        String query = "DELETE FROM vehicle_ownership_transfer_tax_records WHERE tax_type_id = ?";
 //        System.out.println("Executing related data deletion query: " + query + " with ID: " + transferTaxId);
@@ -245,14 +288,13 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
 //        }
 //    }
 //
-    
-    
     @Override
     public long fetchExc(Entity ent) throws Exception {
         TaxOwnerships taxOwnerships = fetchExc(ent.getOID());
         ent = (Entity) taxOwnerships;
         return taxOwnerships.getOID();
     }
+
     public static TaxOwnerships fetchExc(long oid) throws DBException {
         try {
             TaxOwnerships taxOwnerships = new TaxOwnerships();
@@ -264,8 +306,6 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
             taxOwnerships.setNamaPemilikBaru(pstTaxOwnerships.getString(FLD_NEW_NAME));
             taxOwnerships.setAlamatBaru(pstTaxOwnerships.getString(FLD_NEW_ADDRESS));
             taxOwnerships.setJenisPajak(pstTaxOwnerships.getString(FLD_TAX_TYPE));
-
-            
 
             taxOwnerships.setJumlahPajak(pstTaxOwnerships.getdouble(FLD_TOTAL_TAX));
             taxOwnerships.setTanggalProses(pstTaxOwnerships.getDate(FLD_PROCESS_DATE));
@@ -351,8 +391,6 @@ public class PstTaxOwnerships extends DBHandler implements I_DBInterface, I_DBTy
             taxOwnerships.setNamaPemilikBaru(rs.getString(PstTaxOwnerships.fieldNames[PstTaxOwnerships.FLD_NEW_NAME]));
             taxOwnerships.setAlamatBaru(rs.getString(PstTaxOwnerships.fieldNames[PstTaxOwnerships.FLD_NEW_ADDRESS]));
             taxOwnerships.setJenisPajak(rs.getString(PstTaxOwnerships.fieldNames[PstTaxOwnerships.FLD_TAX_TYPE]));
-
-            
 
             taxOwnerships.setJumlahPajak(rs.getDouble(PstTaxOwnerships.fieldNames[PstTaxOwnerships.FLD_TOTAL_TAX]));
             taxOwnerships.setTanggalProses(rs.getDate(PstTaxOwnerships.fieldNames[PstTaxOwnerships.FLD_PROCESS_DATE]));

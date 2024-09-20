@@ -231,6 +231,22 @@
                 var formContainer = document.getElementById('formContainer');
                 formContainer.style.display = (formContainer.style.display === 'none' || formContainer.style.display === '') ? 'block' : 'none';
             }
+
+            // Function to fill form for editing
+            function editData(noPlat, namaPemilikLama, namaPemilikBaru, alamatBaru, jenisPajak, jumlahPajak, tanggalProses, tanggalJatuhTempo, statusPembayaran, tanggalPembayaran, id) {
+                document.getElementById('noPlat').value = noPlat;
+                document.getElementById('namaPemilikLama').value = namaPemilikLama;
+                document.getElementById('namaPemilikBaru').value = namaPemilikBaru;
+                document.getElementById('alamatBaru').value = alamatBaru;
+                document.getElementById('jenisPajak').value = jenisPajak;
+                document.getElementById('jumlahPajak').value = jumlahPajak;
+                document.getElementById('tanggalProses').value = tanggalProses;
+                document.getElementById('tanggalJatuhTempo').value = tanggalJatuhTempo;
+                document.getElementById('statusPembayaran').value = statusPembayaran;
+                document.getElementById('tanggalPembayaran').value = tanggalPembayaran;
+                document.getElementById('id').value = id;
+                toggleForm();
+            }
         </script>
     </head>
     <body>
@@ -251,6 +267,8 @@
                 <!-- Form container -->
                 <div id="formContainer" class="form-container">
                     <form method="post">
+                        <!-- Hidden input for ID -->
+                        <input type="hidden" id="id" name="id" />
                         <!-- Form Fields -->
                         <label for="noPlat">Nomor Plat:</label>
                         <input type="text" id="noPlat" name="noPlat" required />
@@ -304,7 +322,8 @@
                     CtrlTaxOwnerships ctrlTaxOwnerships = new CtrlTaxOwnerships(request);
                     boolean success = false;
 
-                // Mengambil parameter deleteId jika ada
+                    String idStr = request.getParameter("id");
+                    // Mengambil parameter deleteId jika ada
                     String deleteIdStr = request.getParameter("deleteId");
                     if (deleteIdStr != null && !deleteIdStr.isEmpty()) {
                         try {
@@ -382,10 +401,18 @@
                                 taxOwnerships.setTanggalPembayaran(java.sql.Date.valueOf(tanggalPembayaranStr));
                             }
 
-                            // Buat instance PstTaxOwnership untuk memanggil metode insertExc()
+// Buat instance PstTaxOwnership untuk memanggil metode insertExc dan updateExc()
                             PstTaxOwnerships pstTaxOwnerships = new PstTaxOwnerships();
-                            // Gunakan metode insertExc untuk memasukkan data ke database
-                            pstTaxOwnerships.insertExc(taxOwnerships);
+
+                            if (idStr != null && !idStr.isEmpty()) {
+                                long id = Long.parseLong(idStr);
+                                taxOwnerships.setTransferTaxId(id);
+                                // Update data
+                                pstTaxOwnerships.updateExc(taxOwnerships);
+                            } else {
+                                // Insert new data
+                                PstTaxOwnerships.insertExc(taxOwnerships);
+                            }
 
                             // Redirect ke halaman daftar setelah berhasil menyimpan data
                             response.sendRedirect("list_tax_ownerships.jsp");
@@ -436,6 +463,10 @@
 
 
                             <td>
+                                <button onclick="editData('<%= taxOwnerships.getNoPlat()%>', '<%= taxOwnerships.getNamaPemilikLama()%>', '<%= taxOwnerships.getNamaPemilikBaru()%>', '<%= taxOwnerships.getAlamatBaru()%>', '<%= taxOwnerships.getJenisPajak()%>', '<%= taxOwnerships.getJumlahPajak()%>', '<%= taxOwnerships.getTanggalProses()%>', '<%= taxOwnerships.getTanggalJatuhTempo()%>', '<%= taxOwnerships.getStatusPembayaran().toString()%>', '<%= taxOwnerships.getTanggalPembayaran() != null ? taxOwnerships.getTanggalPembayaran().toString() : ""%>', '<%= taxOwnerships.getTransferTaxId()%>')">
+                                    Edit
+                                </button>
+
                                 <!-- Tombol Delete dengan parameter ID -->
                                 <form method="post" action="">
                                     <input type="hidden" name="deleteId" value="<%= taxOwnerships.getTransferTaxId()%>">
@@ -444,7 +475,7 @@
                             </td>
                         </tr>
                         <% }
-                    } else { %>
+                        } else { %>
                         <tr>
                             <td colspan="9" class="no-data">Tidak ada data yang ditemukan.</td>
                         </tr>
