@@ -127,8 +127,8 @@ body {
                         </a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/asset_condition/asset_condition.jsp" class="list-group-item list-group-item-action ${currentPage == 'asset_condition' ? 'active' : ''}">
-                            Asset Condition
+                        <a href="${pageContext.request.contextPath}/tax_vehicle/list_tax_vehicle.jsp" class="list-group-item list-group-item-action ${currentPage == 'list_tax_vehicle' ? 'active' : ''}">
+                           Pajak Kendaraan
                         </a>
                     </li>
                     <li>
