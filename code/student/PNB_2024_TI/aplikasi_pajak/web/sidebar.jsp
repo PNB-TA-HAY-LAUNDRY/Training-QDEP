@@ -132,10 +132,16 @@ body {
                         </a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/asset_type/asset_type.jsp" class="list-group-item list-group-item-action ${currentPage == 'asset_type' ? 'active' : ''}">
-                            Asset Type
+                        <a href="${pageContext.request.contextPath}/tax_fuel_sales/list_tax_fuel_sales.jsp" class="list-group-item list-group-item-action ${currentPage == 'list_tax_fuel_sales' ? 'active' : ''}">
+                            Pajak Bahan Bakar
                         </a>
                     </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/tax_water/list_tax_water.jsp" class="list-group-item list-group-item-action ${currentPage == 'list_tax_water' ? 'active' : ''}">
+                            Pajak Air
+                        </a>
+                    </li>
+                    
                 </ul>
             </div>
         </div>
