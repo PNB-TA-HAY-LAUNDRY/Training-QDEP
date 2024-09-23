@@ -1,1 +1,5 @@
 code/core-qdep/dist/*.*
+/code/student/PNB_2024_TI/aplikasi_pajak/nbproject/private/
+/code/student/PNB_2024_TI/aplikasi_pajak/build/
+/code/student/PNB_2024_TI/aplikasi_pajak/dist/
+/code/core-qdep/nbproject/private/
