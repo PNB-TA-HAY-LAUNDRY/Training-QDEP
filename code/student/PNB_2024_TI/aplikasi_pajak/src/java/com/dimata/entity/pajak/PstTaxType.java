@@ -1,4 +1,4 @@
-package com.dimata.entity.pajak;
+ package com.dimata.entity.pajak;
 
 import com.dimata.qdep.db.DBException;
 import com.dimata.qdep.db.DBHandler;
